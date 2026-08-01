@@ -1,0 +1,25 @@
+# Tool-local AI state (shared instructions are deliberately tracked)
+.claude/settings.local.json
+.codex/
+.gemini/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS / editor junk
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Build artifacts
+node_modules/
+.next/
+out/
+dist/
+coverage/
