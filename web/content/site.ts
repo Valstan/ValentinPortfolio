@@ -35,7 +35,7 @@ export const CONTACTS = {
 /** Каталог сервисов Малмыжа — стандарт онбординга сервиса (директива brain 2026-07-26). */
 export const SERVICES_CATALOG_URL = 'https://xn--b1ae3a1a.xn--80adkdyec4j.xn--p1ai/services';
 
-export const FOOTER_SIGNATURE = 'Сделано программистом Валентином Савиных';
+export const FOOTER_SIGNATURE = 'Сделано вМалмыже.рф (с) Валентин Савиных, 2026';
 
 /**
  * Абсолютный URL в punycode-форме. Прогонять через него ВСЕ исходящие абсолютные ссылки:
