@@ -9,7 +9,8 @@ import { graph, profilePageNode } from '@/lib/jsonld';
 /** Дата, на которую сняты все числа первого экрана. */
 const AS_OF = '1 августа 2026';
 
-const LIVE = WORKS.filter((w) => w.prodUrl && w.status === 'в проде');
+/** Всё, что открывается по своему адресу, — включая каркасы: они тоже отвечают. */
+const LIVE = WORKS.filter((w) => w.prodUrl);
 const PENDING = WORKS.filter((w) => w.status === 'каркас в проде');
 const NO_PUBLIC_URL = WORKS.filter((w) => !w.prodUrl);
 
@@ -101,8 +102,9 @@ export default function HomePage() {
         </div>
         {PENDING.length > 0 && (
           <p className="note">
-            {PENDING.map((w) => w.prodLabel).join(' и ')} — каркасы в проде, ждут контента от
-            учреждений. На {AS_OF} они не отвечали, поэтому в счёт открытых адресов я их не беру.
+            {PENDING.map((w) => w.prodLabel).join(' и ')} помечены янтарным намеренно: сайты
+            открыты и работают, но учреждения ещё не наполнили их контентом. Показываю как есть,
+            а не жду красивой картинки — заказчику полезнее видеть, с чего начинается такой сайт.
           </p>
         )}
         <p className="note note--plain">
