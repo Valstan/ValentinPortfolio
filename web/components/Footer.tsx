@@ -17,6 +17,11 @@ export function Footer() {
           <Link href="/raboty/">Работы</Link>
           <Link href="/uslugi/">Услуги</Link>
           <Link href="/kontakty/">Контакты</Link>
+          {CONTACTS.phone && <a href={`tel:${CONTACTS.phone}`}>{CONTACTS.phoneLabel}</a>}
+          {CONTACTS.email && <a href={`mailto:${CONTACTS.email}`}>{CONTACTS.email}</a>}
+          <a href={CONTACTS.telegram} rel="noopener">
+            {CONTACTS.telegramLabel}
+          </a>
           <a href={CONTACTS.github} rel="noopener">
             {CONTACTS.githubLabel}
           </a>
