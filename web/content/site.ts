@@ -22,8 +22,8 @@ export const PERSON = {
  * Контакты выводятся текстом, а не картинкой: их должны цитировать поиск и ИИ-ассистенты.
  */
 export const CONTACTS = {
-  telegram: 'https://t.me/valstan',
-  telegramLabel: '@valstan',
+  telegram: 'https://t.me/VAL_STAN',
+  telegramLabel: '@VAL_STAN',
   email: 'zubazeirot@proton.me',
   github: 'https://github.com/Valstan',
   githubLabel: 'github.com/Valstan',
