@@ -1,4 +1,4 @@
-import { absoluteUrl, PERSON, SITE_HOST_DISPLAY } from '@/content/site';
+import { absoluteUrl, CONTACTS, PERSON, SITE_HOST_DISPLAY } from '@/content/site';
 import { WORKS, GROUP_ORDER, GROUP_TITLES } from '@/content/works';
 import { SERVICES } from '@/content/services';
 import { TASKS } from '@/content/tasks';
@@ -52,7 +52,12 @@ export function GET(): Response {
     }
   }
 
-  lines.push('## Как связаться', '', `Контакты — ${absoluteUrl('/kontakty/')}.`, '');
+  lines.push('## Как связаться', '');
+  if (CONTACTS.phone) lines.push(`- Телефон: ${CONTACTS.phoneLabel}`);
+  if (CONTACTS.email) lines.push(`- Почта: ${CONTACTS.email}`);
+  lines.push(`- Telegram: ${CONTACTS.telegramLabel} (${CONTACTS.telegram})`);
+  lines.push(`- Код: ${CONTACTS.github}`);
+  lines.push('', `Страница контактов — ${absoluteUrl('/kontakty/')}.`, '');
 
   return new Response(lines.join('\n'), {
     headers: { 'content-type': 'text/plain; charset=utf-8' },

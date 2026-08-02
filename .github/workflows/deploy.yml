@@ -1,11 +1,15 @@
 name: build & deploy
 
 # Сборка в CI, не на боксе (G20: `next build` на маленьком VPS = OOM).
-# Для static export это особенно дёшево: на сервер уезжает готовый каталог статики.
+# Для static export это особенно дёшево: на сервер уезжает готовый каталог.
 #
 # ⚠️ Репозиторий публичный. Ни одного инфраструктурного значения в открытом виде:
 # хост, пользователь, порт и путь берутся ТОЛЬКО из секретов (#008). Ключ деплоя —
-# отдельный, выданный только под этот репозиторий (#001).
+# отдельная пара, выданная только под этот репозиторий (#001): личный ключ владельца
+# в CI не уезжает, отзыв деплой-ключа не задевает остальные доступы.
+#
+# Доставка — tar-потоком по ssh, а не rsync: rsync на целевом боксе не установлен,
+# и ставить лишний пакет на прод ради деплоя статики незачем.
 
 on:
   push:
@@ -45,30 +49,36 @@ jobs:
       - run: pnpm build
 
       # G12: metadata-роуты обязаны реально сгенериться. Проверяем файлами, а не глазами.
-      - name: Проверить обязательные файлы экспорта
+      - name: Проверить полноту экспорта
         run: |
           set -e
-          for f in out/index.html out/robots.txt out/sitemap.xml out/llms.txt out/raboty/index.html; do
+          for f in out/index.html out/robots.txt out/sitemap.xml out/llms.txt out/facts.json \
+                   out/raboty/index.html out/zadachi/index.html out/kontakty/index.html; do
             test -s "$f" || { echo "::error::нет или пуст $f"; exit 1; }
           done
           grep -q 'xn--80adkmnnb2b' out/sitemap.xml || { echo "::error::sitemap не в punycode"; exit 1; }
+          # Юникод-хост в абсолютной ссылке ломает сниппет при шаринге (G133/G134)
+          if grep -rlP 'https?://[^"'"'"' ]*[^\x00-\x7F]' out --include='*.html' | head -1 | grep -q .; then
+            echo "::error::в разметке есть абсолютный URL с юникод-хостом"; exit 1
+          fi
           echo "экспорт полон: $(find out -name '*.html' | wc -l) html-страниц"
+
+      - name: Упаковать
+        run: tar czf ../site.tar.gz -C out .
 
       - uses: actions/upload-artifact@v4
         with:
           name: site
-          path: web/out
+          path: site.tar.gz
           retention-days: 7
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: site
-          path: out
 
       - name: Настроить ключ деплоя
         run: |
@@ -78,7 +88,7 @@ jobs:
           printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      - name: Залить статику
+      - name: Залить статику и переключить релиз
         env:
           SSH_HOST: ${{ secrets.DEPLOY_HOST }}
           SSH_USER: ${{ secrets.DEPLOY_USER }}
@@ -86,12 +96,17 @@ jobs:
           TARGET: ${{ secrets.DEPLOY_PATH }}
         run: |
           set -e
-          # Атомарная замена: заливаем во временный каталог, затем переключаем симлинк.
-          RELEASE="release-$(date -u +%Y%m%d%H%M%S)"
-          rsync -az --delete -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT" \
-            out/ "$SSH_USER@$SSH_HOST:$TARGET/$RELEASE/"
-          ssh -i ~/.ssh/id_deploy -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-            "ln -sfn '$TARGET/$RELEASE' '$TARGET/current.tmp' && mv -T '$TARGET/current.tmp' '$TARGET/current' && ls -1dt '$TARGET'/release-* | tail -n +4 | xargs -r rm -rf"
+          REL="release-$(date -u +%Y%m%d%H%M%S)"
+          SSH="ssh -i ~/.ssh/id_deploy -o IdentitiesOnly=yes -p $SSH_PORT $SSH_USER@$SSH_HOST"
+          # Распаковка на той стороне: новый релиз собирается целиком рядом с текущим
+          $SSH "mkdir -p '$TARGET/releases/$REL'"
+          $SSH "tar xzf - -C '$TARGET/releases/$REL'" < site.tar.gz
+          # Переключение атомарное: mv -T подменяет симлинк одним шагом, без «мигания» 404
+          $SSH "test -s '$TARGET/releases/$REL/index.html' \
+            && ln -sfn '$TARGET/releases/$REL' '$TARGET/current.tmp' \
+            && mv -T '$TARGET/current.tmp' '$TARGET/current' \
+            && ls -1dt '$TARGET'/releases/release-* | tail -n +4 | xargs -r rm -rf \
+            && echo 'релиз $REL активен'"
 
       # #011: смоук грепает МАРКЕР В ТЕЛЕ ответа — у статики 200 отдаёт и пустой индекс.
       - name: Смоук-проверка прода
@@ -99,10 +114,12 @@ jobs:
           SITE: ${{ secrets.SITE_URL }}
         run: |
           set -e
-          body=$(curl -fsSL --max-time 20 "$SITE/")
+          body=$(curl -fsSL --max-time 25 "$SITE/")
           echo "$body" | grep -q 'Савиных' || { echo "::error::главная без подписи автора"; exit 1; }
           echo "$body" | grep -q 'application/ld+json' || { echo "::error::главная без JSON-LD"; exit 1; }
-          curl -fsSL --max-time 20 "$SITE/robots.txt" | grep -q 'Sitemap' || { echo "::error::robots.txt пуст"; exit 1; }
-          curl -fsSL --max-time 20 "$SITE/llms.txt" | grep -q 'Классы задач' || { echo "::error::llms.txt пуст"; exit 1; }
-          curl -fsSL --max-time 20 "$SITE/raboty/" | grep -q 'Работы' || { echo "::error::каталог работ пуст"; exit 1; }
+          curl -fsSL --max-time 25 "$SITE/robots.txt" | grep -q 'Sitemap' || { echo "::error::robots.txt пуст"; exit 1; }
+          # Кириллица в llms.txt ломается, если nginx отдаёт text/plain без charset
+          curl -fsSL --max-time 25 "$SITE/llms.txt" | grep -q 'Классы задач' || { echo "::error::llms.txt пуст или в неверной кодировке"; exit 1; }
+          curl -fsSL --max-time 25 "$SITE/raboty/" | grep -q 'Работы' || { echo "::error::каталог работ пуст"; exit 1; }
+          curl -fsSL --max-time 25 "$SITE/zadachi/" | grep -q 'задачей' || { echo "::error::раздел задач пуст"; exit 1; }
           echo "смоук пройден"
