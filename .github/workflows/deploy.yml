@@ -1,0 +1,108 @@
+name: build & deploy
+
+# Сборка в CI, не на боксе (G20: `next build` на маленьком VPS = OOM).
+# Для static export это особенно дёшево: на сервер уезжает готовый каталог статики.
+#
+# ⚠️ Репозиторий публичный. Ни одного инфраструктурного значения в открытом виде:
+# хост, пользователь, порт и путь берутся ТОЛЬКО из секретов (#008). Ключ деплоя —
+# отдельный, выданный только под этот репозиторий (#001).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm typecheck
+
+      - run: pnpm build
+
+      # G12: metadata-роуты обязаны реально сгенериться. Проверяем файлами, а не глазами.
+      - name: Проверить обязательные файлы экспорта
+        run: |
+          set -e
+          for f in out/index.html out/robots.txt out/sitemap.xml out/llms.txt out/raboty/index.html; do
+            test -s "$f" || { echo "::error::нет или пуст $f"; exit 1; }
+          done
+          grep -q 'xn--80adkmnnb2b' out/sitemap.xml || { echo "::error::sitemap не в punycode"; exit 1; }
+          echo "экспорт полон: $(find out -name '*.html' | wc -l) html-страниц"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: web/out
+          retention-days: 7
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: out
+
+      - name: Настроить ключ деплоя
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Залить статику
+        env:
+          SSH_HOST: ${{ secrets.DEPLOY_HOST }}
+          SSH_USER: ${{ secrets.DEPLOY_USER }}
+          SSH_PORT: ${{ secrets.DEPLOY_PORT }}
+          TARGET: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          set -e
+          # Атомарная замена: заливаем во временный каталог, затем переключаем симлинк.
+          RELEASE="release-$(date -u +%Y%m%d%H%M%S)"
+          rsync -az --delete -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT" \
+            out/ "$SSH_USER@$SSH_HOST:$TARGET/$RELEASE/"
+          ssh -i ~/.ssh/id_deploy -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "ln -sfn '$TARGET/$RELEASE' '$TARGET/current.tmp' && mv -T '$TARGET/current.tmp' '$TARGET/current' && ls -1dt '$TARGET'/release-* | tail -n +4 | xargs -r rm -rf"
+
+      # #011: смоук грепает МАРКЕР В ТЕЛЕ ответа — у статики 200 отдаёт и пустой индекс.
+      - name: Смоук-проверка прода
+        env:
+          SITE: ${{ secrets.SITE_URL }}
+        run: |
+          set -e
+          body=$(curl -fsSL --max-time 20 "$SITE/")
+          echo "$body" | grep -q 'Савиных' || { echo "::error::главная без подписи автора"; exit 1; }
+          echo "$body" | grep -q 'application/ld+json' || { echo "::error::главная без JSON-LD"; exit 1; }
+          curl -fsSL --max-time 20 "$SITE/robots.txt" | grep -q 'Sitemap' || { echo "::error::robots.txt пуст"; exit 1; }
+          curl -fsSL --max-time 20 "$SITE/llms.txt" | grep -q 'Классы задач' || { echo "::error::llms.txt пуст"; exit 1; }
+          curl -fsSL --max-time 20 "$SITE/raboty/" | grep -q 'Работы' || { echo "::error::каталог работ пуст"; exit 1; }
+          echo "смоук пройден"
