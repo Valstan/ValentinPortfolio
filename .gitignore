@@ -23,3 +23,6 @@ node_modules/
 out/
 dist/
 coverage/
+
+# Артефакт инкрементальной сборки TS
+*.tsbuildinfo
