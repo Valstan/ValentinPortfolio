@@ -28,17 +28,25 @@ export default function ContactsPage() {
           </p>
         </div>
 
+        {/* Порядок не случайный: муниципальный заказчик и директор завода звонят,
+            а не пишут в мессенджер. Пустое поле не рендерится. */}
         <div className="contact-list">
-          <a href={CONTACTS.telegram} className="contact-row" rel="noopener">
-            <span className="contact-row__label">Telegram</span>
-            <span className="contact-row__value">{CONTACTS.telegramLabel}</span>
-          </a>
+          {CONTACTS.phone && (
+            <a href={`tel:${CONTACTS.phone}`} className="contact-row">
+              <span className="contact-row__label">Телефон</span>
+              <span className="contact-row__value">{CONTACTS.phoneLabel}</span>
+            </a>
+          )}
           {CONTACTS.email && (
             <a href={`mailto:${CONTACTS.email}`} className="contact-row">
               <span className="contact-row__label">Почта</span>
               <span className="contact-row__value">{CONTACTS.email}</span>
             </a>
           )}
+          <a href={CONTACTS.telegram} className="contact-row" rel="noopener">
+            <span className="contact-row__label">Telegram</span>
+            <span className="contact-row__value">{CONTACTS.telegramLabel}</span>
+          </a>
           <a href={CONTACTS.github} className="contact-row" rel="noopener">
             <span className="contact-row__label">Код</span>
             <span className="contact-row__value">{CONTACTS.githubLabel}</span>
