@@ -29,7 +29,7 @@ export type Work = {
   /** Одна строка курсивом под заголовком — что это за система. */
   tagline: string;
   /** Группа на витрине. */
-  group: 'flagship' | 'events' | 'services' | 'wip';
+  group: 'flagship' | 'events' | 'services';
   status: WorkStatus;
   /** Публичный продуктовый URL в юникоде — для показа. В href всегда прогоняется через absoluteUrl-хелпер. */
   prodUrl?: string;
@@ -265,7 +265,7 @@ export const WORKS: Work[] = [
     slug: 'vmalmyzhe',
     title: 'вМалмыже',
     tagline: 'Городской информационный портал района',
-    group: 'wip',
+    group: 'events',
     status: 'в проде',
     prodUrl: 'https://вмалмыже.рф/',
     prodLabel: 'вмалмыже.рф',
@@ -284,59 +284,16 @@ export const WORKS: Work[] = [
     plans: ['Автоматический поток новостей из внешнего сборщика.', 'Собственное визуальное оформление.'],
     screenshotDir: 'vmalmyzhe',
   },
-  {
-    slug: 'dk-malmyzh',
-    title: 'ДК Малмыж',
-    tagline: 'Сайт районного Центра культуры и досуга',
-    group: 'wip',
-    status: 'каркас в проде',
-    prodUrl: 'https://дкмалмыж.рф/',
-    prodLabel: 'дкмалмыж.рф',
-    whatItGives:
-      'Сайт учреждения культуры: новости, страницы об учреждении, лента событий. Сотрудники наполняют и обновляют сайт сами через простую админку.',
-    underTheHood: [
-      'Единый стек кластера: Next.js 15 + Payload CMS 3.75 + PostgreSQL.',
-      'Автодеплой из CI по SSH с перезапуском службы — обновления без ручной работы на сервере.',
-    ],
-    stack: 'Next.js 15 + Payload CMS 3.75 + PostgreSQL, TypeScript, pnpm; CI/CD + systemd',
-    facts: [
-      { claim: 'Каркас в проде под HTTPS с автопродлением сертификата и кириллическим доменом.', asOf: '2026-07-31', verify: 'measured' },
-      { claim: 'На день съёмки витрины сайт не отвечал — учреждение ещё не наполнило его контентом.', asOf: '2026-08-01', verify: 'external' },
-    ],
-    plans: ['Наполнение контентом силами учреждения.', 'Собственное оформление.'],
-  },
-  {
-    slug: 'kalinino-cks',
-    title: 'Калинино ЦКС',
-    tagline: 'Сайт сельской централизованной клубной системы',
-    group: 'wip',
-    status: 'каркас в проде',
-    prodUrl: 'https://калинино-цкс.рф/',
-    prodLabel: 'калинино-цкс.рф',
-    whatItGives:
-      'Сайт сельских клубов: новости, страницы, лента событий. Наполняется силами учреждения через админку, без программиста.',
-    underTheHood: [
-      'Единый стек кластера: Next.js 15 + Payload CMS 3.75 + PostgreSQL.',
-      'Деплой готовым артефактом из CI: сборка в GitHub Actions, доставка по SSH, перезапуск службы.',
-    ],
-    stack: 'Next.js 15 + Payload CMS 3.75 + PostgreSQL, TypeScript, pnpm; CI/CD + systemd',
-    facts: [
-      { claim: 'Каркас в проде под HTTPS с автопродлением сертификата и кириллическим доменом.', asOf: '2026-07-31', verify: 'measured' },
-      { claim: 'На день съёмки витрины сайт не отвечал — учреждение ещё не наполнило его контентом.', asOf: '2026-08-01', verify: 'external' },
-    ],
-    plans: ['Наполнение контентом силами учреждения.', 'Собственное оформление.'],
-  },
 ];
 
 export const GROUP_TITLES: Record<Work['group'], string> = {
   flagship: 'Флагманы',
-  events: 'Событийные и корпоративные сайты',
+  events: 'Сайты организаций и событий',
   services: 'Сервисы и автоматизация',
-  wip: 'Муниципальный кластер',
 };
 
 /** Порядок групп на витрине. */
-export const GROUP_ORDER: Work['group'][] = ['flagship', 'events', 'services', 'wip'];
+export const GROUP_ORDER: Work['group'][] = ['flagship', 'events', 'services'];
 
 export function workBySlug(slug: string): Work | undefined {
   return WORKS.find((w) => w.slug === slug);
