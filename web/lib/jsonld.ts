@@ -34,6 +34,20 @@ export function personNode(): JsonLdNode {
     ],
     ...(sameAs.length > 0 ? { sameAs } : {}),
     ...(CONTACTS.email ? { email: CONTACTS.email } : {}),
+    ...(CONTACTS.phone ? { telephone: CONTACTS.phone } : {}),
+    // ContactPoint — то, что ассистент цитирует, когда его спрашивают «как связаться»
+    ...(CONTACTS.phone || CONTACTS.email
+      ? {
+          contactPoint: {
+            '@type': 'ContactPoint',
+            contactType: 'Обсуждение задачи',
+            areaServed: 'RU',
+            availableLanguage: 'ru',
+            ...(CONTACTS.phone ? { telephone: CONTACTS.phone } : {}),
+            ...(CONTACTS.email ? { email: CONTACTS.email } : {}),
+          },
+        }
+      : {}),
   };
 }
 

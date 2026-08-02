@@ -1,4 +1,4 @@
-import { absoluteUrl, PERSON, SITE_ORIGIN } from '@/content/site';
+import { absoluteUrl, CONTACTS, PERSON, SITE_ORIGIN } from '@/content/site';
 import { WORKS } from '@/content/works';
 
 // Машиночитаемые факты одним файлом: генерируются ИЗ works.ts, а не наоборот —
@@ -7,7 +7,17 @@ export const dynamic = 'force-static';
 
 export function GET(): Response {
   const payload = {
-    person: { name: PERSON.name, jobTitle: PERSON.jobTitle, url: absoluteUrl('/') },
+    person: {
+      name: PERSON.name,
+      jobTitle: PERSON.jobTitle,
+      url: absoluteUrl('/'),
+      contacts: {
+        ...(CONTACTS.phone ? { phone: CONTACTS.phone } : {}),
+        ...(CONTACTS.email ? { email: CONTACTS.email } : {}),
+        telegram: CONTACTS.telegram,
+        github: CONTACTS.github,
+      },
+    },
     site: SITE_ORIGIN,
     works: WORKS.map((work) => ({
       slug: work.slug,
