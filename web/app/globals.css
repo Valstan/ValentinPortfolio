@@ -850,14 +850,14 @@ ul {
     align-items: start;
   }
 }
-.shots figure {
+.shot-fig {
   margin: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
   background: var(--bg-sunken);
 }
-.shots figcaption {
+.shot-fig figcaption {
   padding: 8px 12px;
   font-size: 0.82rem;
   color: var(--text-faint);
@@ -981,4 +981,31 @@ ul {
   opacity: 0.55;
   font-size: 0.8rem;
   line-height: 1;
+}
+
+/* Рабочие экраны настольной программы идут в колонку на всю ширину:
+   вся их ценность в деталях, а бок о бок они ужимаются до нечитаемого. */
+.shots--equal {
+  grid-template-columns: minmax(0, 1fr);
+}
+.shot-fig {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.shot-fig .shot {
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.shot-fig figcaption {
+  padding: 9px 12px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: var(--bg-raised);
+  flex: 1;
 }

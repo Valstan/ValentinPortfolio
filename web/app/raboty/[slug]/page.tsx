@@ -68,16 +68,24 @@ export default async function WorkPage({ params }: { params: Promise<Params> }) 
 
       <div className="wrap work-layout">
         <div className="prose">
-          {work.screenshotDir ? (
-            <div className="shots">
-              <ShotFrame
-                dir={work.screenshotDir}
-                domain={work.prodLabel}
-                title={work.title}
-                eager
-              />
-              <ShotFrame dir={work.screenshotDir} variant="mobile" title={work.title} eager />
-            </div>
+          {work.shots ? (
+            <>
+              {/* Сетка подстраивается под состав: пара «компьютер + телефон» у сайта,
+                  два равных рабочих экрана у настольной программы. */}
+              <div className={work.shots.items.some((s) => s.ratio === 'phone') ? 'shots' : 'shots shots--equal'}>
+                {work.shots.items.map((shot) => (
+                  <ShotFrame
+                    key={shot.file}
+                    dir={work.shots!.dir}
+                    shot={shot}
+                    title={work.title}
+                    eager
+                    withCaption
+                  />
+                ))}
+              </div>
+              {work.shotsNote && <p className="note note--plain">{work.shotsNote}</p>}
+            </>
           ) : (
             <ArchDiagram slug={work.slug} note={work.noScreenshotReason} />
           )}
