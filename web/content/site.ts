@@ -27,8 +27,9 @@ export const CONTACTS = {
   email: 'zubazeirot@proton.me',
   github: 'https://github.com/Valstan',
   githubLabel: 'github.com/Valstan',
-  phone: '',
-  phoneLabel: '',
+  // В href — без пробелов и скобок (иначе часть телефонов не наберётся), в подписи — читаемо.
+  phone: '+79229005910',
+  phoneLabel: '+7 922 900-59-10',
 } as const;
 
 /** Каталог сервисов Малмыжа — стандарт онбординга сервиса (директива brain 2026-07-26). */
