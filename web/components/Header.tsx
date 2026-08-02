@@ -6,7 +6,9 @@ export function Header() {
     <header className="site-header">
       <div className="wrap site-header__inner">
         <Link href="/" className="brand">
-          <span className="brand__mark" aria-hidden="true">VS</span>
+          <span className="brand__mark" aria-hidden="true">
+            <img src="/brand/vs-monogram-512.png" alt="" width="512" height="512" />
+          </span>
           <span className="brand__copy">
             {PERSON.name}
             <span>{PERSON.jobTitle.toLowerCase()}</span>

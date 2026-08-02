@@ -6,7 +6,9 @@ export function Footer() {
     <footer className="site-footer">
       <div className="wrap site-footer__inner">
         <div className="site-footer__identity">
-          <span className="site-footer__seal" aria-hidden="true">VS</span>
+          <span className="site-footer__seal" aria-hidden="true">
+            <img src="/brand/vs-monogram-512.png" alt="" width="512" height="512" loading="lazy" />
+          </span>
           <div>
           {/* Та же подпись, что несут все сайты экосистемы; у себя — без ссылки на себя. */}
           <div className="site-footer__sig">{FOOTER_SIGNATURE}</div>
