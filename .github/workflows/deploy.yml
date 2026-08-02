@@ -109,17 +109,49 @@ jobs:
             && echo 'релиз $REL активен'"
 
       # #011: смоук грепает МАРКЕР В ТЕЛЕ ответа — у статики 200 отдаёт и пустой индекс.
-      - name: Смоук-проверка прода
+      #
+      # Проверяем НА БОКСЕ, через nginx с нужным Host-заголовком. Это и есть настоящий
+      # предмет проверки: переключился ли симлинк, отдаёт ли nginx новый релиз, не потерялась
+      # ли кодировка. Внешняя проверка отсюда ненадёжна — раннеры GitHub стоят вне России
+      # и до хоста доходят через раз (первый же прогон упал по таймауту при живом сайте).
+      - name: Смоук-проверка на боксе
+        env:
+          SSH_HOST: ${{ secrets.DEPLOY_HOST }}
+          SSH_USER: ${{ secrets.DEPLOY_USER }}
+          SSH_PORT: ${{ secrets.DEPLOY_PORT }}
+          SITE_HOST: xn--80adkmnnb2b.xn--80adkdyec4j.xn--p1ai
+        run: |
+          set -e
+          SSH="ssh -i ~/.ssh/id_deploy -o IdentitiesOnly=yes -p $SSH_PORT $SSH_USER@$SSH_HOST"
+          get() { $SSH "curl -fsS --max-time 15 -H 'Host: $SITE_HOST' http://127.0.0.1$1"; }
+          need() { echo "$1" | grep -q "$2" || { echo "::error::$3"; exit 1; }; }
+
+          home=$(get /)
+          need "$home" 'Савиных'            'главная без подписи автора'
+          need "$home" 'application/ld+json' 'главная без JSON-LD'
+          need "$(get /robots.txt)" 'Sitemap' 'robots.txt пуст'
+          need "$(get /raboty/)"    'Работы'  'каталог работ пуст'
+          need "$(get /zadachi/)"   'задачей' 'раздел задач пуст'
+
+          # Кириллица в llms.txt ломается, если nginx отдаёт text/plain без charset —
+          # проверяем и содержимое, и сам заголовок: файл может быть корректным, а отдача нет.
+          need "$(get /llms.txt)" 'Классы задач' 'llms.txt пуст'
+          ct=$($SSH "curl -fsSI --max-time 15 -H 'Host: $SITE_HOST' http://127.0.0.1/llms.txt" | tr -d '\r' | grep -i '^content-type:')
+          need "$ct" 'charset=utf-8' "llms.txt отдаётся без charset=utf-8 ($ct) — кириллица у ИИ-ботов превратится в кашу"
+
+          echo "смоук на боксе пройден"
+
+      # Внешняя проверка — как есть: подтверждает сквозной путь через edge хостинга,
+      # но не валит сборку, если раннер просто не дотянулся до России.
+      - name: Внешняя проверка (не блокирующая)
+        continue-on-error: true
         env:
           SITE: ${{ secrets.SITE_URL }}
         run: |
-          set -e
-          body=$(curl -fsSL --max-time 25 "$SITE/")
-          echo "$body" | grep -q 'Савиных' || { echo "::error::главная без подписи автора"; exit 1; }
-          echo "$body" | grep -q 'application/ld+json' || { echo "::error::главная без JSON-LD"; exit 1; }
-          curl -fsSL --max-time 25 "$SITE/robots.txt" | grep -q 'Sitemap' || { echo "::error::robots.txt пуст"; exit 1; }
-          # Кириллица в llms.txt ломается, если nginx отдаёт text/plain без charset
-          curl -fsSL --max-time 25 "$SITE/llms.txt" | grep -q 'Классы задач' || { echo "::error::llms.txt пуст или в неверной кодировке"; exit 1; }
-          curl -fsSL --max-time 25 "$SITE/raboty/" | grep -q 'Работы' || { echo "::error::каталог работ пуст"; exit 1; }
-          curl -fsSL --max-time 25 "$SITE/zadachi/" | grep -q 'задачей' || { echo "::error::раздел задач пуст"; exit 1; }
-          echo "смоук пройден"
+          if body=$(curl -fsSL --max-time 30 --retry 3 --retry-delay 10 --retry-all-errors "$SITE/"); then
+            echo "$body" | grep -q 'Савиных' \
+              && echo "снаружи сайт отвечает и содержит подпись" \
+              || echo "::warning::снаружи ответ получен, но подписи в нём нет"
+          else
+            echo "::warning::снаружи достучаться не удалось (маршрут раннера до РФ), смоук на боксе пройден"
+          fi
