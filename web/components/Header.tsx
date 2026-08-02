@@ -6,8 +6,11 @@ export function Header() {
     <header className="site-header">
       <div className="wrap site-header__inner">
         <Link href="/" className="brand">
-          {PERSON.name}
-          <span>{PERSON.jobTitle.toLowerCase()}</span>
+          <span className="brand__mark" aria-hidden="true">VS</span>
+          <span className="brand__copy">
+            {PERSON.name}
+            <span>{PERSON.jobTitle.toLowerCase()}</span>
+          </span>
         </Link>
         <nav className="nav" aria-label="Основная навигация">
           <Link href="/zadachi/">Задачи</Link>

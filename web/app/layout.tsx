@@ -35,6 +35,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ru">
       <body>
+        <div className="page-atmosphere" aria-hidden="true">
+          <span className="page-atmosphere__orb page-atmosphere__orb--one" />
+          <span className="page-atmosphere__orb page-atmosphere__orb--two" />
+          <span className="page-atmosphere__sigil page-atmosphere__sigil--one" />
+          <span className="page-atmosphere__sigil page-atmosphere__sigil--two" />
+        </div>
         <a className="skip-link" href="#main">
           К основному содержанию
         </a>

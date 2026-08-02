@@ -5,12 +5,15 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <div className="wrap site-footer__inner">
-        <div>
+        <div className="site-footer__identity">
+          <span className="site-footer__seal" aria-hidden="true">VS</span>
+          <div>
           {/* Та же подпись, что несут все сайты экосистемы; у себя — без ссылки на себя. */}
           <div className="site-footer__sig">{FOOTER_SIGNATURE}</div>
           <p className="site-footer__note">
             Проектирование, разработка и вывод в прод целиком — от базы данных до сервера с сертификатом.
           </p>
+          </div>
         </div>
         <div className="site-footer__links">
           <Link href="/zadachi/">Задачи</Link>
