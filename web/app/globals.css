@@ -838,25 +838,6 @@ ul {
   line-height: 1.55;
 }
 
-/* Скриншоты на странице работы: десктоп + мобайл рядом, одинаковые пропорции */
-.shots {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: minmax(0, 1fr);
-}
-@media (min-width: 620px) {
-  .shots {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    align-items: start;
-  }
-}
-.shot-fig {
-  margin: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--bg-sunken);
-}
 .shot-fig figcaption {
   padding: 8px 12px;
   font-size: 0.82rem;
@@ -983,11 +964,6 @@ ul {
   line-height: 1;
 }
 
-/* Рабочие экраны настольной программы идут в колонку на всю ширину:
-   вся их ценность в деталях, а бок о бок они ужимаются до нечитаемого. */
-.shots--equal {
-  grid-template-columns: minmax(0, 1fr);
-}
 .shot-fig {
   margin: 0;
   display: flex;
@@ -1008,4 +984,21 @@ ul {
   border-radius: 0 0 var(--radius) var(--radius);
   background: var(--bg-raised);
   flex: 1;
+}
+
+/* ---------- Раскладка снимков на странице работы ---------- */
+
+/* Широкие экраны — в колонку на всю ширину: деталь важнее числа картинок в ряд */
+.shots-wide {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Телефон — узкой лентой под ними, несколькими в ряд, если их станет больше */
+.shots-phone {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 240px));
+  margin-top: 18px;
 }

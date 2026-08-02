@@ -70,20 +70,38 @@ export default async function WorkPage({ params }: { params: Promise<Params> }) 
         <div className="prose">
           {work.shots ? (
             <>
-              {/* Сетка подстраивается под состав: пара «компьютер + телефон» у сайта,
-                  два равных рабочих экрана у настольной программы. */}
-              <div className={work.shots.items.some((s) => s.ratio === 'phone') ? 'shots' : 'shots shots--equal'}>
-                {work.shots.items.map((shot) => (
-                  <ShotFrame
-                    key={shot.file}
-                    dir={work.shots!.dir}
-                    shot={shot}
-                    title={work.title}
-                    eager
-                    withCaption
-                  />
-                ))}
+              {/* Широкие экраны идут в колонку на всю ширину — вся их ценность в деталях,
+                  а бок о бок они ужимаются до нечитаемого. Телефон уходит вниз узкой лентой.
+                  Такая раскладка держит любой состав: один экран, два или два плюс телефон. */}
+              <div className="shots-wide">
+                {work.shots.items
+                  .filter((shot) => shot.ratio === 'wide')
+                  .map((shot) => (
+                    <ShotFrame
+                      key={shot.file}
+                      dir={work.shots!.dir}
+                      shot={shot}
+                      title={work.title}
+                      eager
+                      withCaption
+                    />
+                  ))}
               </div>
+              {work.shots.items.some((shot) => shot.ratio === 'phone') && (
+                <div className="shots-phone">
+                  {work.shots.items
+                    .filter((shot) => shot.ratio === 'phone')
+                    .map((shot) => (
+                      <ShotFrame
+                        key={shot.file}
+                        dir={work.shots!.dir}
+                        shot={shot}
+                        title={work.title}
+                        withCaption
+                      />
+                    ))}
+                </div>
+              )}
               {work.shotsNote && <p className="note note--plain">{work.shotsNote}</p>}
             </>
           ) : (
