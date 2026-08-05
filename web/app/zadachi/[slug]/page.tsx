@@ -82,11 +82,15 @@ export default async function TaskPage({ params }: { params: Promise<Params> }) 
         <div className="section__head">
           <h2>Где это уже сделано</h2>
         </div>
-        <div className="works">
-          {works.map((work) => (
-            <WorkCard key={work.slug} work={work} />
-          ))}
-        </div>
+        {works.length > 0 ? (
+          <div className="works">
+            {works.map((work) => (
+              <WorkCard key={work.slug} work={work} />
+            ))}
+          </div>
+        ) : (
+          <p className="note note--plain">По этой задаче работы временно сняты с витрины — верну, когда снова будут показаны.</p>
+        )}
       </section>
 
       {facts.length > 0 && (

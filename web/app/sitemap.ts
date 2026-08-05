@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { absoluteUrl } from '@/content/site';
 import { TASKS } from '@/content/tasks';
-import { WORKS } from '@/content/works';
+import { VISIBLE_WORKS } from '@/content/works';
 
 // ⚠️ G12: строго в корне app/. После сборки проверять строку `/sitemap.xml` в route-таблице.
 
@@ -19,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
-    ...WORKS.map((work) => ({
+    ...VISIBLE_WORKS.map((work) => ({
       url: absoluteUrl(`/raboty/${work.slug}/`),
       changeFrequency: 'monthly' as const,
       priority: 0.7,

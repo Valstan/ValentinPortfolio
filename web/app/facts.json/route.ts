@@ -1,5 +1,5 @@
 import { absoluteUrl, CONTACTS, PERSON, SITE_ORIGIN } from '@/content/site';
-import { WORKS } from '@/content/works';
+import { VISIBLE_WORKS } from '@/content/works';
 
 // Машиночитаемые факты одним файлом: генерируются ИЗ works.ts, а не наоборот —
 // разъехаться с сайтом не могут. Каждый факт несёт дату замера и признак проверяемости.
@@ -19,7 +19,7 @@ export function GET(): Response {
       },
     },
     site: SITE_ORIGIN,
-    works: WORKS.map((work) => ({
+    works: VISIBLE_WORKS.map((work) => ({
       slug: work.slug,
       title: work.title,
       tagline: work.tagline,

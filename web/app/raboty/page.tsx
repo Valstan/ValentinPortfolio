@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { JsonLd } from '@/components/JsonLd';
 import { WorkCard } from '@/components/WorkCard';
-import { GROUP_ORDER, GROUP_TITLES, WORKS } from '@/content/works';
+import { GROUP_ORDER, GROUP_TITLES, VISIBLE_WORKS } from '@/content/works';
 import { breadcrumbNode, graph } from '@/lib/jsonld';
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default function WorksPage() {
         <div className="section__head">
           <h1>Работы</h1>
           <p className="section__lede">
-            {WORKS.length} систем: у каждой — что она даёт заказчику, как устроена внутри и в каком
+            {VISIBLE_WORKS.length} систем: у каждой — что она даёт заказчику, как устроена внутри и в каком
             состоянии находится сейчас. Там, где сайт публичный, есть ссылка — можно открыть и
             проверить.
           </p>
@@ -33,7 +33,7 @@ export default function WorksPage() {
       </section>
 
       {GROUP_ORDER.map((group) => {
-        const works = WORKS.filter((work) => work.group === group);
+        const works = VISIBLE_WORKS.filter((work) => work.group === group);
         if (works.length === 0) return null;
         return (
           <section key={group} className="wrap section">
