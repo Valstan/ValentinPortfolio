@@ -14,8 +14,11 @@ Gemini CLI и других агентов. Инструкции конкретн
 - Карточка проекта: `../brain_matrica/projects/ValentinPortfolio.md`. Концепт: `../brain_matrica/docs/plans/valentin-portfolio-concept.md`.
 - `docs/SESSION_HANDOFF.md` — локальная память последней сессии (статус, нитка, следующий шаг).
 
-`brain_matrica` разрешено только читать. Никогда не изменяй и не коммить файлы в
-`../brain_matrica`. Предложения Мозгу оформляй в `mailbox/to-brain/*.md` этого репозитория.
+`brain_matrica` и другие соседние репозитории — **только чтение** (мандат владельца
+2026-08-04): никаких `fetch`, `pull`, `checkout` и иных синхронизирующих/изменяющих команд
+в чужих репо — проект или Мозг могут одновременно работать в их локальных копиях (в т.ч.
+иметь ещё не запушенную почту). Никогда не изменяй и не коммить файлы в `../brain_matrica`.
+Предложения Мозгу оформляй в `mailbox/to-brain/*.md` этого репозитория.
 
 ## ⛔ Публикационный предохранитель (MUST, без свободы трактовки)
 
@@ -37,10 +40,25 @@ Gemini CLI и других агентов. Инструкции конкретн
 
 | Направление | Кто пишет | Где |
 |---|---|---|
-| `brain → Портфолио` | brain | `../brain_matrica/mailboxes/ValentinPortfolio/from-brain/*.md` (мы только **читаем** после `git pull --ff-only`) |
+| `brain → Портфолио` | brain | `../brain_matrica/mailboxes/ValentinPortfolio/from-brain/*.md` — читается из **двух каналов** (локально + GitHub API, § ниже) |
 | `Портфолио → brain` | мы | **`mailbox/to-brain/*.md`** в этом репо (через PR) |
 
 Сканить только корень `from-brain/` (не `DRAFTS/`, не `ARCHIVE/`). Compliance: `mandate`→MUST, `recommend`→SHOULD, `suggest`→MAY.
+
+**Двухканальное чтение входящего mailbox (мандат владельца 2026-08-04):** brain_matrica
+синхронизирующим командам не подвергается вообще, входящие письма читаются из двух
+независимых источников и **объединяются** (видимое только на GitHub — такое же «новое»,
+как видимое только локально):
+
+1. **Локально:** корень `../brain_matrica/mailboxes/ValentinPortfolio/from-brain/*.md`.
+2. **GitHub API/веб** (без clone/fetch/pull): `gh api "repos/Valstan/brain_matrica/contents/mailboxes/ValentinPortfolio/from-brain"` → список имён; содержимое письма — raw: `gh api -H "Accept: application/vnd.github.raw" "repos/Valstan/brain_matrica/contents/mailboxes/ValentinPortfolio/from-brain/<file>.md"`.
+
+Правило свежести для одноимённого письма в обоих источниках — по истории **именно этого
+пути**, не репозитория целиком: локальная версия с незакоммиченными изменениями — более
+свежий кандидат; иначе последний локальный коммит файла (`git log -1 --format=%ct -- <path>`)
+против последнего коммита пути на GitHub. Порядок надёжно не определяется — прочитать обе
+версии, явно отметить конфликт, **ничего не перезаписывать**. Свежесть одного письма/репо
+на другие не переносится.
 
 Формат `mailbox/to-brain/YYYY-MM-DD-slug.md`:
 
@@ -60,13 +78,12 @@ urgency: low | normal | high
 
 В начале работы:
 
-1. Сначала синхронизируй этот репозиторий (`git fetch`, затем безопасный fast-forward).
-2. Синхронизируй `../brain_matrica` только fast-forward и только при чистом дереве.
-3. Прочитай входящие `../brain_matrica/mailboxes/ValentinPortfolio/from-brain/*.md`.
-4. Прочитай `docs/SESSION_HANDOFF.md` и проверь `git status`/последние коммиты.
+1. Синхронизируй **только этот** репозиторий (`git fetch`, затем безопасный fast-forward при чистом дереве). Чужие репо (в т.ч. `brain_matrica`) не синхронизировать вообще.
+2. Прочитай входящие `../brain_matrica/mailboxes/ValentinPortfolio/from-brain/*.md` **двухканально** (локально + GitHub API, §📬) и объедини наборы.
+3. Прочитай `docs/SESSION_HANDOFF.md` и проверь `git status`/последние коммиты.
 
 В конце значимой работы обнови `docs/SESSION_HANDOFF.md`, сохрани изменения через PR и
-оставь оба репозитория синхронизированными и чистыми. Подробные исполняемые памятки лежат
+оставь репозиторий синхронизированным и чистым. Подробные исполняемые памятки лежат
 в `.claude/commands/start.md`, `close_session.md` и `obriv.md`; несмотря на имя каталога,
 их workflow применим к любому агенту. Правило чтения памяток для любого агента:
 `allowed-tools:` игнорировать; `/команда` = «выполни шаги файла»; `AskUserQuestion: «…»` =
