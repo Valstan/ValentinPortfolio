@@ -3,23 +3,23 @@ import { JsonLd } from '@/components/JsonLd';
 import { StatusBadge } from '@/components/StatusBadge';
 import { WorkCard } from '@/components/WorkCard';
 import { TASKS } from '@/content/tasks';
-import { GROUP_ORDER, GROUP_TITLES, WORKS, workBySlug } from '@/content/works';
+import { GROUP_ORDER, GROUP_TITLES, VISIBLE_WORKS, workBySlug } from '@/content/works';
 import { graph, profilePageNode } from '@/lib/jsonld';
 
 /** Дата, на которую сняты все числа первого экрана. */
-const AS_OF = '1 августа 2026';
+const AS_OF = '5 августа 2026';
 
 /** Всё, что открывается по своему адресу, — включая каркасы: они тоже отвечают. */
-const LIVE = WORKS.filter((w) => w.prodUrl);
-const PENDING = WORKS.filter((w) => w.status === 'каркас в проде');
-const NO_PUBLIC_URL = WORKS.filter((w) => !w.prodUrl);
+const LIVE = VISIBLE_WORKS.filter((w) => w.prodUrl);
+const PENDING = VISIBLE_WORKS.filter((w) => w.status === 'каркас в проде');
+const NO_PUBLIC_URL = VISIBLE_WORKS.filter((w) => !w.prodUrl);
 
 /**
  * Числа первого экрана считаются ИЗ каталога, а не набиваются руками:
  * добавилась работа — цифра обновилась сама, разъехаться не может.
  */
 const COUNTERS = [
-  { num: String(WORKS.length), label: 'систем доведено до прода' },
+  { num: String(VISIBLE_WORKS.length), label: 'систем доведено до прода' },
   { num: String(LIVE.length), label: 'адресов можно открыть прямо сейчас' },
   { num: '128', label: 'страниц перенесено за один день без потери позиций' },
   { num: '13', label: 'лет летописи собрано в один архив' },
@@ -30,7 +30,7 @@ export default function HomePage() {
     <>
       <section className="wrap hero">
         <h1 className="hero__title">
-          {WORKS.length} систем в проде. {LIVE.length} можно открыть прямо сейчас
+          {VISIBLE_WORKS.length} систем в проде. {LIVE.length} можно открыть прямо сейчас
         </h1>
         <p className="hero__lede">
           Сайты, учётные системы и автоматизация для организаций и бизнеса. Беру задачу целиком:
@@ -115,7 +115,7 @@ export default function HomePage() {
       </section>
 
       {GROUP_ORDER.map((group) => {
-        const works = WORKS.filter((work) => work.group === group);
+        const works = VISIBLE_WORKS.filter((work) => work.group === group);
         if (works.length === 0) return null;
         return (
           <section key={group} className="wrap section">

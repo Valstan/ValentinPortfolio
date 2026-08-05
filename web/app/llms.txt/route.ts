@@ -1,5 +1,5 @@
 import { absoluteUrl, CONTACTS, PERSON, SITE_HOST_DISPLAY } from '@/content/site';
-import { WORKS, GROUP_ORDER, GROUP_TITLES } from '@/content/works';
+import { VISIBLE_WORKS, GROUP_ORDER, GROUP_TITLES } from '@/content/works';
 import { SERVICES } from '@/content/services';
 import { TASKS } from '@/content/tasks';
 
@@ -28,7 +28,7 @@ export function GET(): Response {
   ];
 
   for (const group of GROUP_ORDER) {
-    const works = WORKS.filter((w) => w.group === group);
+    const works = VISIBLE_WORKS.filter((w) => w.group === group);
     if (works.length === 0) continue;
     lines.push(`## ${GROUP_TITLES[group]}`, '');
     for (const work of works) {

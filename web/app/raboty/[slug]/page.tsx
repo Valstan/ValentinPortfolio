@@ -6,13 +6,13 @@ import { FactColumns } from '@/components/FactList';
 import { JsonLd } from '@/components/JsonLd';
 import { ShotFrame } from '@/components/ShotFrame';
 import { StatusBadge } from '@/components/StatusBadge';
-import { WORKS, workBySlug } from '@/content/works';
+import { VISIBLE_WORKS, workBySlug } from '@/content/works';
 import { breadcrumbNode, creativeWorkNode, graph } from '@/lib/jsonld';
 
 type Params = { slug: string };
 
 export function generateStaticParams(): Params[] {
-  return WORKS.map((work) => ({ slug: work.slug }));
+  return VISIBLE_WORKS.map((work) => ({ slug: work.slug }));
 }
 
 export async function generateMetadata({

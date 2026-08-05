@@ -33,7 +33,7 @@ export function ShotFrame({
       )}
       <img
         src={`/shots/${dir}/${shot.file}`}
-        alt={`${title}: ${shot.caption.toLowerCase()}. Снимок 2 августа 2026`}
+        alt={`${title}: ${shot.caption.toLowerCase()}. Снимок 2026 года`}
         width={wide ? 1280 : 750}
         height={wide ? 800 : 1440}
         loading={eager ? 'eager' : 'lazy'}

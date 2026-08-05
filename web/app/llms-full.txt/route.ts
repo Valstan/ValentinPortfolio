@@ -1,7 +1,7 @@
 import { absoluteUrl, CONTACTS, PERSON, SITE_HOST_DISPLAY } from '@/content/site';
 import { SERVICES } from '@/content/services';
 import { TASKS } from '@/content/tasks';
-import { WORKS } from '@/content/works';
+import { VISIBLE_WORKS, workBySlug } from '@/content/works';
 
 // Весь значимый текст сайта одним файлом: один запрос — весь сайт, точное цитирование
 // без обхода страниц. Генерируется из тех же данных, что и страницы.
@@ -29,16 +29,16 @@ export function GET(): Response {
     for (const a of task.approach) out.push(`- ${a}`);
     out.push('', `Сроки: ${task.timeline}`);
     if (task.notDoing) out.push(`Чего не делаю: ${task.notDoing}`);
-    out.push('', `Где сделано: ${task.proof.join(', ')}`, '');
+    out.push('', `Где сделано: ${task.proof.filter((s) => workBySlug(s)).join(', ')}`, '');
   }
 
   out.push('='.repeat(72), 'КЛАССЫ ЗАДАЧ', '='.repeat(72), '');
   for (const s of SERVICES) {
-    out.push(`## ${s.title}`, `Запрос заказчика: ${s.need}`, s.body, `Доказательства: ${s.proof.join(', ')}`, '');
+    out.push(`## ${s.title}`, `Запрос заказчика: ${s.need}`, s.body, `Доказательства: ${s.proof.filter((k) => workBySlug(k)).join(', ')}`, '');
   }
 
   out.push('='.repeat(72), 'РАБОТЫ', '='.repeat(72), '');
-  for (const work of WORKS) {
+  for (const work of VISIBLE_WORKS) {
     out.push(`## ${work.title} — ${work.tagline}`);
     out.push(`Страница: ${absoluteUrl(`/raboty/${work.slug}/`)}`);
     if (work.prodUrl) out.push(`Работающий сайт: ${new URL(work.prodUrl).href} (${work.prodLabel})`);
