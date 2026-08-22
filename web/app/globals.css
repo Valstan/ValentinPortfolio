@@ -903,6 +903,25 @@ ul {
   margin-top: 6px;
   max-width: 46ch;
 }
+/*
+  Информер Метрики: внешняя картинка 88×31 с фоном #EFEFEF. Рамка и скругление —
+  чтобы светлый прямоугольник не висел в подвале инородным пятном, но сам кадр
+  не перекрашиваем: цифры внутри рисует Яндекс, и подложка задана в самой ссылке
+  на информер, а не здесь.
+*/
+.site-footer__counter {
+  display: inline-block;
+  margin-top: 12px;
+  line-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+.site-footer__counter:hover {
+  opacity: 1;
+}
 .site-footer__links {
   display: grid;
   gap: 8px;
