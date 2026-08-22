@@ -16,6 +16,7 @@ on:
     branches: [main]
     paths:
       - 'web/**'
+      - 'scripts/check-export.sh'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
@@ -49,19 +50,9 @@ jobs:
       - run: pnpm build
 
       # G12: metadata-роуты обязаны реально сгенериться. Проверяем файлами, а не глазами.
+      # Текст проверки общий с PR-гейтом (`ci.yml`) — чтобы гейт и деплой не разошлись.
       - name: Проверить полноту экспорта
-        run: |
-          set -e
-          for f in out/index.html out/robots.txt out/sitemap.xml out/llms.txt out/facts.json \
-                   out/raboty/index.html out/zadachi/index.html out/kontakty/index.html; do
-            test -s "$f" || { echo "::error::нет или пуст $f"; exit 1; }
-          done
-          grep -q 'xn--80adkmnnb2b' out/sitemap.xml || { echo "::error::sitemap не в punycode"; exit 1; }
-          # Юникод-хост в абсолютной ссылке ломает сниппет при шаринге (G133/G134)
-          if grep -rlP 'https?://[^"'"'"' ]*[^\x00-\x7F]' out --include='*.html' | head -1 | grep -q .; then
-            echo "::error::в разметке есть абсолютный URL с юникод-хостом"; exit 1
-          fi
-          echo "экспорт полон: $(find out -name '*.html' | wc -l) html-страниц"
+        run: bash ../scripts/check-export.sh out
 
       - name: Упаковать
         run: tar czf ../site.tar.gz -C out .
