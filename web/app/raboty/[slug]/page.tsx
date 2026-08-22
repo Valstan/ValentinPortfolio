@@ -76,13 +76,16 @@ export default async function WorkPage({ params }: { params: Promise<Params> }) 
               <div className="shots-wide">
                 {work.shots.items
                   .filter((shot) => shot.ratio === 'wide')
-                  .map((shot) => (
+                  /* Жадно грузится только первый кадр — он и так в первом экране.
+                     У Матрицы снимков девять; `eager` на всех тянул бы больше мегабайта
+                     до первой отрисовки ради картинок, которых читатель ещё не видит. */
+                  .map((shot, i) => (
                     <ShotFrame
                       key={shot.file}
                       dir={work.shots!.dir}
                       shot={shot}
                       title={work.title}
-                      eager
+                      eager={i === 0}
                       withCaption
                     />
                   ))}
