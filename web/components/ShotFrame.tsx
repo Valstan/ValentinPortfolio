@@ -44,9 +44,18 @@ export function ShotFrame({
 
   if (!withCaption) return frame;
 
+  /*
+    В карточке работы снимок ещё и открывается в полном размере отдельной вкладкой.
+    Колонка прозы у́же 700 px, а на этих экранах ценность именно в деталях — таблицы
+    учётной системы в такой ширине не читаются. Ссылка, а не лайтбокс: у сайта static
+    export, и тащить ради этого JS в браузер незачем.
+  */
   return (
     <figure className="shot-fig">
-      {frame}
+      <a className="shot-fig__link" href={`/shots/${dir}/${shot.file}`} target="_blank" rel="noopener">
+        {frame}
+        <span className="shot-fig__zoom">Открыть в полном размере&nbsp;↗</span>
+      </a>
       <figcaption>{shot.caption}</figcaption>
     </figure>
   );
