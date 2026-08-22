@@ -3,6 +3,7 @@ import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { JsonLd } from '@/components/JsonLd';
+import { Metrika } from '@/components/Metrika';
 import { absoluteUrl, PERSON, SITE_ORIGIN } from '@/content/site';
 import { graph, personNode, websiteNode } from '@/lib/jsonld';
 
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         {/* Person + WebSite описываются один раз на весь сайт; остальные узлы ссылаются по @id. */}
         <JsonLd json={graph(personNode(), websiteNode())} />
+        <Metrika />
       </body>
     </html>
   );

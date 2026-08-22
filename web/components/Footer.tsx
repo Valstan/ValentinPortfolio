@@ -1,5 +1,11 @@
 import Link from 'next/link';
-import { CONTACTS, FOOTER_SIGNATURE, SERVICES_CATALOG_URL } from '@/content/site';
+import {
+  CONTACTS,
+  FOOTER_SIGNATURE,
+  METRIKA_INFORMER_SRC,
+  METRIKA_STAT_URL,
+  SERVICES_CATALOG_URL,
+} from '@/content/site';
 
 export function Footer() {
   return (
@@ -15,6 +21,27 @@ export function Footer() {
           <p className="site-footer__note">
             Проектирование, разработка и вывод в прод целиком — от базы данных до сервера с сертификатом.
           </p>
+          {/*
+            Видимая цифра посещаемости — требование владельца (D-017): кабинет открывают
+            раз в месяц, подвал — каждый раз, когда заходишь на свой сайт.
+            Размеры проставлены явно: это внешняя картинка, без width/height подвал дёргается
+            при её загрузке.
+          */}
+          <a
+            className="site-footer__counter"
+            href={METRIKA_STAT_URL}
+            target="_blank"
+            rel="nofollow noopener"
+          >
+            <img
+              src={METRIKA_INFORMER_SRC}
+              width={88}
+              height={31}
+              loading="lazy"
+              alt="Яндекс.Метрика"
+              title="Яндекс.Метрика: данные за сегодня (просмотры, визиты и уникальные посетители)"
+            />
+          </a>
           </div>
         </div>
         <div className="site-footer__links">
