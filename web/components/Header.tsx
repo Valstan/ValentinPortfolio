@@ -18,6 +18,7 @@ export function Header() {
           <Link href="/zadachi/">Задачи</Link>
           <Link href="/raboty/">Работы</Link>
           <Link href="/uslugi/">Услуги</Link>
+          <Link href="/tehzadanie/">Техзадание</Link>
           <Link href="/grabli/">Грабли</Link>
           <Link href="/kontakty/">Контакты</Link>
           {/* Стандарт онбординга сервиса: кнопка каталога сервисов Малмыжа */}

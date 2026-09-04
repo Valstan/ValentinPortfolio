@@ -24,7 +24,7 @@ test -d "$OUT" || { echo "::error::нет каталога экспорта $OUT
 
 for f in index.html robots.txt sitemap.xml llms.txt llms-full.txt facts.json og.png \
          404.html raboty/index.html zadachi/index.html kontakty/index.html \
-         uslugi/index.html grabli/index.html; do
+         uslugi/index.html grabli/index.html tehzadanie/index.html; do
   test -s "$OUT/$f" || { echo "::error::нет или пуст $OUT/$f"; exit 1; }
 done
 
@@ -43,6 +43,19 @@ test "$gotchas" -ge 1 || { echo "::error::не сгенерирована ни �
 expected_gotchas=$(grep -c "^    slug: '" "$CONTENT/gotchas.ts")
 test "$gotchas" -eq "$expected_gotchas" || {
   echo "::error::страниц грабель в выхлопе $gotchas, а в журнале $expected_gotchas"
+  exit 1
+}
+
+# Конструктор черновика — единственная страница с клиентским кодом. Список вопросов
+# обязан быть в html текстом: без этого страница пустеет у того, у кого не
+# исполняются скрипты, и у краулера, а именно этот список — её цитируемая часть.
+expected_questions=$(grep -c "^    ask: '" "$CONTENT/brief.ts")
+# `grep -c` считает СТРОКИ с совпадением, а минифицированный html — это одна
+# длинная строка: проверка давала 2 из 8 при полностью отрендеренной странице.
+# Считаем вхождения, а не строки.
+rendered_questions=$(grep -o 'Зачем спрашиваю' "$OUT/tehzadanie/index.html" | wc -l)
+test "$rendered_questions" -ge "$expected_questions" || {
+  echo "::error::на /tehzadanie/ отрендерено $rendered_questions вопросов из $expected_questions — страница пустеет без JS"
   exit 1
 }
 

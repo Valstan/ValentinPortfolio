@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { FactColumns } from '@/components/FactList';
 import { JsonLd } from '@/components/JsonLd';
 import { WorkCard } from '@/components/WorkCard';
+import { briefHrefForTask } from '@/content/brief';
 import { TASKS, taskBySlug } from '@/content/tasks';
 import { workBySlug } from '@/content/works';
 import { breadcrumbNode, graph } from '@/lib/jsonld';
@@ -112,7 +113,12 @@ export default async function TaskPage({ params }: { params: Promise<Params> }) 
           </p>
         </div>
         <div className="hero__actions">
-          <Link href="/kontakty/" className="btn btn--primary">
+          {/* Первый вопрос конструктора уже отмечен: со страницы задачи известно,
+              с чем человек пришёл. */}
+          <Link href={briefHrefForTask(task.slug)} className="btn btn--primary">
+            Собрать черновик по этой задаче
+          </Link>
+          <Link href="/kontakty/" className="btn btn--ghost">
             Написать
           </Link>
           <Link href="/zadachi/" className="btn btn--ghost">

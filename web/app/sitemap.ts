@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { BRIEF_AS_OF } from '@/content/brief';
 import { GOTCHAS } from '@/content/gotchas';
 import { absoluteUrl } from '@/content/site';
 import { TASKS } from '@/content/tasks';
@@ -37,6 +38,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     { url: absoluteUrl('/uslugi/'), changeFrequency: 'monthly', priority: 0.8 },
     { url: absoluteUrl('/kontakty/'), changeFrequency: 'yearly', priority: 0.7 },
+    {
+      url: absoluteUrl('/tehzadanie/'),
+      changeFrequency: 'monthly' as const,
+      priority: 0.85,
+      lastModified: BRIEF_AS_OF,
+    },
     {
       url: absoluteUrl('/grabli/'),
       changeFrequency: 'monthly' as const,
