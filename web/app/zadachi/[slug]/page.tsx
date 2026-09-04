@@ -7,6 +7,7 @@ import { WorkCard } from '@/components/WorkCard';
 import { TASKS, taskBySlug } from '@/content/tasks';
 import { workBySlug } from '@/content/works';
 import { breadcrumbNode, graph } from '@/lib/jsonld';
+import { pageMetadata } from '@/lib/metadata';
 
 type Params = { slug: string };
 
@@ -18,14 +19,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { slug } = await params;
   const task = taskBySlug(slug);
   if (!task) return {};
-  return {
+  return pageMetadata({
     title: task.question,
     description: `${task.question}. ${task.approach[0]} Где это уже сделано: ${task.proof
       .map((s) => workBySlug(s)?.title)
       .filter(Boolean)
       .join(', ')}.`.slice(0, 300),
-    alternates: { canonical: `/zadachi/${task.slug}/` },
-  };
+    path: `/zadachi/${task.slug}/`,
+  });
 }
 
 export default async function TaskPage({ params }: { params: Promise<Params> }) {

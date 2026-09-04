@@ -73,6 +73,27 @@ export const SERVICES_CATALOG_URL = 'https://xn--b1ae3a1a.xn--80adkdyec4j.xn--p1
 export const FOOTER_SIGNATURE = 'Сделано вМалмыже.рф (с) Валентин Савиных, 2026';
 
 /**
+ * Картинка для соцсетей и превью в ответах ассистентов.
+ *
+ * Лежит статикой в `public/`, а не генерируется роутом `app/opengraph-image.tsx`:
+ * при `output: 'export'` генератор запекается в файл БЕЗ расширения (`out/opengraph-image`),
+ * и nginx отдаёт его как `application/octet-stream` — та же болезнь, что у `/llms.txt`
+ * (грабля с потерей `content-type` при экспорте). Соцсети такую картинку молча
+ * игнорируют. Файл с расширением `.png` эту зависимость от настройки сервера снимает.
+ *
+ * Пересобрать при смене имени или должности: временно вернуть `app/opengraph-image.tsx`
+ * с `ImageResponse` (нужен `export const dynamic = 'force-static'`, а каждый div с
+ * несколькими детьми — с явным `display: flex`), собрать и скопировать
+ * `out/opengraph-image` в `public/og.png`.
+ */
+export const OG_IMAGE = {
+  url: absoluteUrl('/og.png'),
+  width: 1200,
+  height: 630,
+  alt: `${PERSON.name} — ${PERSON.jobTitle.toLowerCase()}, ${PERSON.areaServed}`,
+} as const;
+
+/**
  * Абсолютный URL в punycode-форме. Прогонять через него ВСЕ исходящие абсолютные ссылки:
  * `new URL()` каноникализирует хост в punycode и percent-кодирует юникод в пути.
  */

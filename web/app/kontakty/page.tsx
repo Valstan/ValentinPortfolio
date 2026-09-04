@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { JsonLd } from '@/components/JsonLd';
 import { CONTACTS, PERSON } from '@/content/site';
 import { breadcrumbNode, graph } from '@/lib/jsonld';
+import { pageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Контакты',
-  description: `Связаться с разработчиком: ${PERSON.name}. Обсуждение задачи, сроков и стоимости.`,
-  alternates: { canonical: '/kontakty/' },
-};
+  description: `Связаться с разработчиком: ${PERSON.name}, ${PERSON.areaServed}. Обсуждение задачи, сроков и стоимости — телефон, почта, Telegram.`,
+  path: '/kontakty/',
+});
 
 export default function ContactsPage() {
   return (

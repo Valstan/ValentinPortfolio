@@ -3,14 +3,15 @@ import Link from 'next/link';
 import { JsonLd } from '@/components/JsonLd';
 import { SERVICES } from '@/content/services';
 import { workBySlug } from '@/content/works';
-import { breadcrumbNode, graph } from '@/lib/jsonld';
+import { breadcrumbNode, graph, offerCatalogNode } from '@/lib/jsonld';
+import { pageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Услуги',
   description:
-    'Сайты и порталы под ключ, настольные учётные системы, сервисы автоматизации, мобильные PWA с пуш-уведомлениями, единый вход и 152-ФЗ, вывод в прод на российских серверах.',
-  alternates: { canonical: '/uslugi/' },
-};
+    'Сайты и порталы под ключ, настольные учётные системы, сервисы автоматизации, мобильные PWA с пуш-уведомлениями, единый вход и 152-ФЗ, вывод в прод на российских серверах. Кировская область и удалённо по России.',
+  path: '/uslugi/',
+});
 
 export default function ServicesPage() {
   return (
@@ -93,6 +94,7 @@ export default function ServicesPage() {
             { name: 'Главная', path: '/' },
             { name: 'Услуги', path: '/uslugi/' },
           ]),
+          offerCatalogNode(SERVICES),
         )}
       />
     </>

@@ -3,14 +3,15 @@ import Link from 'next/link';
 import { JsonLd } from '@/components/JsonLd';
 import { WorkCard } from '@/components/WorkCard';
 import { GROUP_ORDER, GROUP_TITLES, VISIBLE_WORKS } from '@/content/works';
-import { breadcrumbNode, graph } from '@/lib/jsonld';
+import { breadcrumbNode, graph, itemListNode } from '@/lib/jsonld';
+import { pageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Работы',
   description:
-    'Каталог систем, доведённых до прода: сайты и порталы на Next.js и Payload CMS, настольная ERP на Electron, сервисы автоматизации на Python, мобильное PWA с пуш-уведомлениями.',
-  alternates: { canonical: '/raboty/' },
-};
+    'Каталог систем, доведённых до прода: сайты и порталы на Next.js и Payload CMS, настольная ERP на Electron, сервисы автоматизации на Python, мобильное PWA с пуш-уведомлениями. Заказчики — учреждения и бизнес Малмыжа и Кировской области.',
+  path: '/raboty/',
+});
 
 export default function WorksPage() {
   return (
@@ -55,6 +56,13 @@ export default function WorksPage() {
             { name: 'Главная', path: '/' },
             { name: 'Работы', path: '/raboty/' },
           ]),
+          itemListNode(
+            '/raboty/#list',
+            VISIBLE_WORKS.map((work) => ({
+              name: work.title,
+              path: `/raboty/${work.slug}/`,
+            })),
+          ),
         )}
       />
     </>
