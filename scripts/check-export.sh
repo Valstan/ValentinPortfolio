@@ -12,6 +12,14 @@ set -euo pipefail
 
 OUT="${1:-out}"
 
+# Каталог с данными ищем от расположения скрипта, а не от текущего каталога:
+# CI зовёт его из `web/` (`bash ../scripts/check-export.sh out`), а руками его
+# запускают из корня. Захардкоженный `web/content/...` работал только во втором
+# случае и валил гейт в первом — с `grep: No such file`, то есть код 2, что для
+# этой проверки означает «не отработала», а не «чисто».
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONTENT="$REPO_ROOT/web/content"
+
 test -d "$OUT" || { echo "::error::нет каталога экспорта $OUT"; exit 1; }
 
 for f in index.html robots.txt sitemap.xml llms.txt llms-full.txt facts.json og.png \
@@ -32,7 +40,7 @@ test "$works" -ge 1 || { echo "::error::не сгенерирована ни о�
 test "$tasks" -ge 1 || { echo "::error::не сгенерирована ни одна страница задачи"; exit 1; }
 test "$gotchas" -ge 1 || { echo "::error::не сгенерирована ни одна страница журнала грабель"; exit 1; }
 
-expected_gotchas=$(grep -c "^    slug: '" web/content/gotchas.ts)
+expected_gotchas=$(grep -c "^    slug: '" "$CONTENT/gotchas.ts")
 test "$gotchas" -eq "$expected_gotchas" || {
   echo "::error::страниц грабель в выхлопе $gotchas, а в журнале $expected_gotchas"
   exit 1
@@ -40,8 +48,8 @@ test "$gotchas" -eq "$expected_gotchas" || {
 
 # Число страниц обязано совпасть с каталогом: если работа выпала из выхлопа, а
 # остальные на месте, поштучная проверка этого не увидит.
-expected_works=$(grep -c "^    slug: '" web/content/works.ts)
-hidden_works=$(grep -c '^    hidden: true,' web/content/works.ts || true)
+expected_works=$(grep -c "^    slug: '" "$CONTENT/works.ts")
+hidden_works=$(grep -c '^    hidden: true,' "$CONTENT/works.ts" || true)
 expected_visible=$((expected_works - hidden_works))
 test "$works" -eq "$expected_visible" || {
   echo "::error::страниц работ в выхлопе $works, а видимых в каталоге $expected_visible"
