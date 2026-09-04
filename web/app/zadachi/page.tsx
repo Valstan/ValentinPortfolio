@@ -30,6 +30,10 @@ export default function TasksPage() {
             выглядит изнутри организации, что я по ней делаю, где это уже сделано и за какой срок.
           </p>
         </div>
+        <p className="note note--plain">
+          Не уверены, какая из них ваша? <Link href="/tehzadanie/">Соберите черновик техзадания</Link>{' '}
+          — восемь вопросов, и задача опишется сама.
+        </p>
         <div className="tasks">
           {TASKS.map((task) => (
             <Link key={task.slug} href={`/zadachi/${task.slug}/`} className="task-tile">

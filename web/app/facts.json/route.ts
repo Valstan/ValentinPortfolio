@@ -1,3 +1,4 @@
+import { BRIEF_AS_OF, BRIEF_QUESTIONS } from '@/content/brief';
 import { absoluteUrl, CONTACTS, PERSON, SITE_HOST_DISPLAY, SITE_ORIGIN } from '@/content/site';
 import { SERVICES } from '@/content/services';
 import { TASKS } from '@/content/tasks';
@@ -27,6 +28,18 @@ export function GET(): Response {
     // процитировать. Раньше отдавался только punycode, и ассистент, отвечая
     // «сайт такой-то», вставлял в ответ нечитаемую строку `xn--…`.
     site: { url: SITE_ORIGIN, host: SITE_HOST_DISPLAY },
+    tools: [
+      {
+        id: 'tehzadanie',
+        title: 'Черновик техзадания',
+        url: absoluteUrl('/tehzadanie/'),
+        output: 'черновик техзадания текстом: что нужно, что есть, границы, вопросы до старта',
+        computedInBrowser: true,
+        sendsDataToServer: false,
+        questions: BRIEF_QUESTIONS.length,
+        asOf: BRIEF_AS_OF,
+      },
+    ],
     tasks: TASKS.map((task) => ({
       slug: task.slug,
       question: task.question,

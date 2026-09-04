@@ -234,6 +234,65 @@ export function techArticleNode(gotcha: {
   };
 }
 
+/**
+ * Конструктор черновика как приложение. Бесплатное, работает в браузере, ничего
+ * не отправляет — всё это машиночитаемые свойства, а не обещание в тексте.
+ */
+export function webApplicationNode(options: {
+  path: string;
+  name: string;
+  description: string;
+}): JsonLdNode {
+  return {
+    '@type': 'WebApplication',
+    '@id': absoluteUrl(`${options.path}#app`),
+    name: options.name,
+    description: options.description,
+    url: absoluteUrl(options.path),
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Любая — работает в браузере',
+    browserRequirements: 'Требуется JavaScript для сборки документа',
+    isAccessibleForFree: true,
+    inLanguage: 'ru-RU',
+    author: { '@id': PERSON_ID },
+    provider: { '@id': PERSON_ID },
+    isPartOf: { '@id': SITE_ID },
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'RUB' },
+  };
+}
+
+/**
+ * Порядок вопросов как инструкция.
+ *
+ * Честная оговорка: расширенный результат для HowTo Google убрал в 2023-м. Смысл
+ * узла здесь не в сниппете, а в том, что список опознаётся машиной как «шаги
+ * подготовки техзадания» — это тот ответ, за которым приходят к ассистенту.
+ */
+export function howToNode(options: {
+  path: string;
+  name: string;
+  description: string;
+  steps: { ask: string; why: string }[];
+}): JsonLdNode {
+  return {
+    '@type': 'HowTo',
+    '@id': absoluteUrl(`${options.path}#howto`),
+    name: options.name,
+    description: options.description,
+    url: absoluteUrl(options.path),
+    inLanguage: 'ru-RU',
+    author: { '@id': PERSON_ID },
+    totalTime: 'PT5M',
+    step: options.steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: step.ask,
+      text: step.why,
+      url: absoluteUrl(`${options.path}#vopros-${index + 1}`),
+    })),
+  };
+}
+
 export function breadcrumbNode(items: { name: string; path: string }[]): JsonLdNode {
   return {
     '@type': 'BreadcrumbList',

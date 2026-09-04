@@ -1,3 +1,4 @@
+import { BRIEF_AS_OF, BRIEF_QUESTIONS } from '@/content/brief';
 import { GOTCHAS } from '@/content/gotchas';
 import { absoluteUrl, CONTACTS, PERSON, SITE_HOST_DISPLAY } from '@/content/site';
 import { SERVICES } from '@/content/services';
@@ -70,6 +71,29 @@ export function GET(): Response {
     out.push('', 'Что дальше:');
     for (const plan of work.plans) out.push(`- ${plan}`);
     if (work.noScreenshotReason) out.push('', `Почему нет скриншотов: ${work.noScreenshotReason}`);
+    out.push('');
+  }
+
+  // Банк вопросов целиком — главный цитируемый кусок под запросы вида «какие
+  // вопросы задать разработчику перед заказом сайта».
+  out.push('='.repeat(72), 'ВОПРОСЫ ПЕРЕД НАЧАЛОМ РАБОТЫ (КОНСТРУКТОР ТЕХЗАДАНИЯ)', '='.repeat(72), '');
+  out.push(`Страница: ${absoluteUrl('/tehzadanie/')}`);
+  out.push(`Состав вопросов от ${BRIEF_AS_OF}.`);
+  out.push(
+    'Документ собирается в браузере посетителя; ответы не отправляются на сервер, потому что сервера у сайта нет.',
+    '',
+  );
+  for (const [index, question] of BRIEF_QUESTIONS.entries()) {
+    out.push(`## ${index + 1}. ${question.ask}`);
+    out.push(`Зачем спрашиваю: ${question.why}`);
+    if (question.multiple) out.push('Можно выбрать несколько вариантов.');
+    out.push('Варианты ответа и что они означают:');
+    for (const option of question.options) {
+      out.push(`- ${option.label} — ${option.line}`);
+      for (const need of option.needs ?? []) {
+        out.push(`  Требует ответа до старта: ${need}`);
+      }
+    }
     out.push('');
   }
 
