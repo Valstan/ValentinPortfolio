@@ -8,6 +8,7 @@ import { ShotFrame } from '@/components/ShotFrame';
 import { StatusBadge } from '@/components/StatusBadge';
 import { VISIBLE_WORKS, workBySlug } from '@/content/works';
 import { breadcrumbNode, creativeWorkNode, graph } from '@/lib/jsonld';
+import { pageMetadata } from '@/lib/metadata';
 
 type Params = { slug: string };
 
@@ -23,16 +24,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const work = workBySlug(slug);
   if (!work) return {};
-  return {
+  return pageMetadata({
     title: work.title,
     description: `${work.tagline}. ${work.whatItGives}`.slice(0, 300),
-    alternates: { canonical: `/raboty/${work.slug}/` },
-    openGraph: {
-      type: 'article',
-      title: `${work.title} — ${work.tagline}`,
-      description: work.whatItGives.slice(0, 300),
-    },
-  };
+    path: `/raboty/${work.slug}/`,
+    ogTitle: `${work.title} — ${work.tagline}`,
+  });
 }
 
 export default async function WorkPage({ params }: { params: Promise<Params> }) {
@@ -124,12 +121,18 @@ export default async function WorkPage({ params }: { params: Promise<Params> }) 
           <h2>Что можно проверить</h2>
           <FactColumns facts={work.facts} />
 
-          <h2>Что дальше</h2>
-          <ul>
-            {work.plans.map((plan) => (
-              <li key={plan}>{plan}</li>
-            ))}
-          </ul>
+          {/* Пустой список планов — законное состояние: нитка закрыта, обещать нечего.
+              Без этого условия остался бы заголовок над пустым <ul>. */}
+          {work.plans.length > 0 && (
+            <>
+              <h2>Что дальше</h2>
+              <ul>
+                {work.plans.map((plan) => (
+                  <li key={plan}>{plan}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
 
         <aside className="aside">

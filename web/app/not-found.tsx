@@ -1,4 +1,18 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+/**
+ * 404 обязана быть исключена из индекса и не тянуть canonical корня.
+ * Без этого блока она наследовала `alternates.canonical: '/'` и `robots.index: true`
+ * из корневого layout: страница-ошибка объявляла себя копией главной и просила
+ * себя проиндексировать. При static export это `404.html`.
+ */
+export const metadata: Metadata = {
+  title: 'Страница не найдена',
+  description: 'Такого адреса на сайте нет — начните с каталога работ.',
+  alternates: { canonical: null },
+  robots: { index: false, follow: true },
+};
 
 export default function NotFound() {
   return (

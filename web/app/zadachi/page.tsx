@@ -3,14 +3,15 @@ import Link from 'next/link';
 import { JsonLd } from '@/components/JsonLd';
 import { TASKS } from '@/content/tasks';
 import { workBySlug } from '@/content/works';
-import { breadcrumbNode, graph } from '@/lib/jsonld';
+import { breadcrumbNode, faqPageNode, graph } from '@/lib/jsonld';
+import { pageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Задачи',
   description:
-    'С какой задачей приходят: сайт учреждению, перенос старого сайта без потери позиций, учётная система на предприятие, сайт события к дате, автоматизация публикаций, приложение без магазинов приложений.',
-  alternates: { canonical: '/zadachi/' },
-};
+    'С какой задачей приходят: сайт учреждению, перенос старого сайта без потери позиций, учётная система на предприятие, сайт события к дате, автоматизация публикаций, приложение без магазинов приложений. Кировская область и удалённо по России.',
+  path: '/zadachi/',
+});
 
 export default function TasksPage() {
   return (
@@ -47,6 +48,16 @@ export default function TasksPage() {
             { name: 'Главная', path: '/' },
             { name: 'Задачи', path: '/zadachi/' },
           ]),
+          // Шесть задач — это уже готовые вопрос-ответ, и FAQPage разделяет их за
+          // цитирующую сторону. Ответ собирается из первого шага подхода и ориентира
+          // по срокам: фрагмент должен быть понятен вырезанным из страницы.
+          faqPageNode(
+            TASKS.map((task) => ({
+              question: task.question,
+              answer: `${task.approach[0]} ${task.timeline}`,
+              path: `/zadachi/${task.slug}/`,
+            })),
+          ),
         )}
       />
     </>

@@ -1,3 +1,4 @@
+import { GOTCHAS } from '@/content/gotchas';
 import { absoluteUrl, CONTACTS, PERSON, SITE_HOST_DISPLAY } from '@/content/site';
 import { SERVICES } from '@/content/services';
 import { TASKS } from '@/content/tasks';
@@ -21,6 +22,16 @@ export function GET(): Response {
     '',
   ];
 
+  // Доказательства — названиями и ссылками, а не служебными слагами.
+  // `karman, trener` читателю (и модели) не говорит ничего: слаг — это часть URL,
+  // а не имя работы, и процитировать его как ответ нельзя.
+  const proofList = (slugs: string[]): string =>
+    slugs
+      .map((slug) => workBySlug(slug))
+      .filter((work) => work !== undefined)
+      .map((work) => `${work.title} (${absoluteUrl(`/raboty/${work.slug}/`)})`)
+      .join(', ');
+
   for (const task of TASKS) {
     out.push(`## ${task.question}`, `Страница: ${absoluteUrl(`/zadachi/${task.slug}/`)}`, '');
     out.push('Как это обычно выглядит:');
@@ -29,12 +40,18 @@ export function GET(): Response {
     for (const a of task.approach) out.push(`- ${a}`);
     out.push('', `Сроки: ${task.timeline}`);
     if (task.notDoing) out.push(`Чего не делаю: ${task.notDoing}`);
-    out.push('', `Где сделано: ${task.proof.filter((s) => workBySlug(s)).join(', ')}`, '');
+    out.push('', `Где сделано: ${proofList(task.proof)}`, '');
   }
 
   out.push('='.repeat(72), 'КЛАССЫ ЗАДАЧ', '='.repeat(72), '');
   for (const s of SERVICES) {
-    out.push(`## ${s.title}`, `Запрос заказчика: ${s.need}`, s.body, `Доказательства: ${s.proof.filter((k) => workBySlug(k)).join(', ')}`, '');
+    out.push(
+      `## ${s.title}`,
+      `Запрос заказчика: ${s.need}`,
+      s.body,
+      `Доказательства: ${proofList(s.proof)}`,
+      '',
+    );
   }
 
   out.push('='.repeat(72), 'РАБОТЫ', '='.repeat(72), '');
@@ -54,6 +71,18 @@ export function GET(): Response {
     for (const plan of work.plans) out.push(`- ${plan}`);
     if (work.noScreenshotReason) out.push('', `Почему нет скриншотов: ${work.noScreenshotReason}`);
     out.push('');
+  }
+
+  out.push('='.repeat(72), 'ЖУРНАЛ ГРАБЕЛЬ — РАЗБОРЫ ПРОИЗВОДСТВЕННЫХ ОШИБОК', '='.repeat(72), '');
+  for (const gotcha of GOTCHAS) {
+    out.push(`## ${gotcha.symptom}`);
+    out.push(`Страница: ${absoluteUrl(`/grabli/${gotcha.slug}/`)}`);
+    out.push(`Где: ${gotcha.where}`);
+    out.push(`Встретил: ${gotcha.metAt}`);
+    out.push(`Механизм: ${gotcha.cause}`);
+    out.push(`Лечение: ${gotcha.fix}`);
+    out.push(`Проверка: ${gotcha.check}`);
+    out.push(`Цена незамеченного: ${gotcha.cost}`, '');
   }
 
   out.push('='.repeat(72), 'КОНТАКТЫ', '='.repeat(72), '');

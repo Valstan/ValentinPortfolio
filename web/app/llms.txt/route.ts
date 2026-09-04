@@ -1,3 +1,4 @@
+import { GOTCHAS } from '@/content/gotchas';
 import { absoluteUrl, CONTACTS, PERSON, SITE_HOST_DISPLAY } from '@/content/site';
 import { VISIBLE_WORKS, GROUP_ORDER, GROUP_TITLES } from '@/content/works';
 import { SERVICES } from '@/content/services';
@@ -17,13 +18,22 @@ export function GET(): Response {
     '> Все факты ниже снабжены датой замера. verify=external — читатель может проверить сам; verify=measured — замер автора.',
     `> Машиночитаемые факты: ${absoluteUrl('/facts.json')}. Полный текст сайта: ${absoluteUrl('/llms-full.txt')}.`,
     '',
+    // Формат llmstxt.org: каждый пункт — markdown-ссылка `- [имя](url): пояснение`.
+    // Так фрагмент остаётся полезным вырезанным из файла: у модели есть и название,
+    // и адрес, который она может процитировать, — раньше адрес стоял голым текстом
+    // после тире, и связь «имя ↔ ссылка» приходилось угадывать.
     '## С какой задачей приходят',
     '',
-    ...TASKS.map((task) => `- **${task.question}** — ${absoluteUrl(`/zadachi/${task.slug}/`)}`),
+    ...TASKS.map(
+      (task) =>
+        `- [${task.question}](${absoluteUrl(`/zadachi/${task.slug}/`)}): ${task.timeline}`,
+    ),
     '',
     '## Классы задач',
     '',
-    ...SERVICES.map((s) => `- **${s.title}** — ${s.need.toLowerCase()}. ${s.body}`),
+    ...SERVICES.map(
+      (s) => `- [${s.title}](${absoluteUrl('/uslugi/')}): ${s.need.toLowerCase()}. ${s.body}`,
+    ),
     '',
   ];
 
@@ -51,6 +61,26 @@ export function GET(): Response {
       lines.push('');
     }
   }
+
+  // Журнал грабель — самая цитируемая часть сайта: узкие датированные ответы с
+  // названной версией инструмента. Один адрес на один симптом.
+  lines.push('## Разборы производственных ошибок (журнал грабель)', '');
+  for (const gotcha of GOTCHAS) {
+    lines.push(
+      `- [${gotcha.symptom}](${absoluteUrl(`/grabli/${gotcha.slug}/`)}): ${gotcha.where}. ${gotcha.cause} Лечение: ${gotcha.fix}`,
+    );
+  }
+  lines.push('');
+
+  // Раздел, предусмотренный форматом: то, что можно пропустить при коротком контексте.
+  lines.push(
+    '## Optional',
+    '',
+    `- [Полный текст сайта](${absoluteUrl('/llms-full.txt')}): все страницы задач, услуг и работ одним файлом.`,
+    `- [Машиночитаемые факты](${absoluteUrl('/facts.json')}): те же сведения в JSON, каждый факт с датой замера.`,
+    `- [Каталог работ](${absoluteUrl('/raboty/')}): все системы одной страницей.`,
+    '',
+  );
 
   lines.push('## Как связаться', '');
   if (CONTACTS.phone) lines.push(`- Телефон: ${CONTACTS.phoneLabel}`);

@@ -12,12 +12,49 @@ set -euo pipefail
 
 OUT="${1:-out}"
 
+# Каталог с данными ищем от расположения скрипта, а не от текущего каталога:
+# CI зовёт его из `web/` (`bash ../scripts/check-export.sh out`), а руками его
+# запускают из корня. Захардкоженный `web/content/...` работал только во втором
+# случае и валил гейт в первом — с `grep: No such file`, то есть код 2, что для
+# этой проверки означает «не отработала», а не «чисто».
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONTENT="$REPO_ROOT/web/content"
+
 test -d "$OUT" || { echo "::error::нет каталога экспорта $OUT"; exit 1; }
 
-for f in index.html robots.txt sitemap.xml llms.txt facts.json \
-         raboty/index.html zadachi/index.html kontakty/index.html; do
+for f in index.html robots.txt sitemap.xml llms.txt llms-full.txt facts.json og.png \
+         404.html raboty/index.html zadachi/index.html kontakty/index.html \
+         uslugi/index.html grabli/index.html; do
   test -s "$OUT/$f" || { echo "::error::нет или пуст $OUT/$f"; exit 1; }
 done
+
+# Детальные страницы — самая многочисленная часть сайта и единственная, которую
+# генерирует `generateStaticParams`. Сломайся он — сводные страницы остались бы на
+# месте, и прежний гейт назвал бы экспорт полным. Проверяем по каталогу, а не
+# списком имён: список пришлось бы править руками при каждой новой работе, и он
+# разошёлся бы с `works.ts` молча.
+works=$(find "$OUT/raboty" -mindepth 2 -name index.html | wc -l)
+tasks=$(find "$OUT/zadachi" -mindepth 2 -name index.html | wc -l)
+gotchas=$(find "$OUT/grabli" -mindepth 2 -name index.html | wc -l)
+test "$works" -ge 1 || { echo "::error::не сгенерирована ни одна страница работы"; exit 1; }
+test "$tasks" -ge 1 || { echo "::error::не сгенерирована ни одна страница задачи"; exit 1; }
+test "$gotchas" -ge 1 || { echo "::error::не сгенерирована ни одна страница журнала грабель"; exit 1; }
+
+expected_gotchas=$(grep -c "^    slug: '" "$CONTENT/gotchas.ts")
+test "$gotchas" -eq "$expected_gotchas" || {
+  echo "::error::страниц грабель в выхлопе $gotchas, а в журнале $expected_gotchas"
+  exit 1
+}
+
+# Число страниц обязано совпасть с каталогом: если работа выпала из выхлопа, а
+# остальные на месте, поштучная проверка этого не увидит.
+expected_works=$(grep -c "^    slug: '" "$CONTENT/works.ts")
+hidden_works=$(grep -c '^    hidden: true,' "$CONTENT/works.ts" || true)
+expected_visible=$((expected_works - hidden_works))
+test "$works" -eq "$expected_visible" || {
+  echo "::error::страниц работ в выхлопе $works, а видимых в каталоге $expected_visible"
+  exit 1
+}
 
 grep -q 'xn--80adkmnnb2b' "$OUT/sitemap.xml" || { echo "::error::sitemap не в punycode"; exit 1; }
 
@@ -39,6 +76,27 @@ case "$rc" in
   0) echo "::error::в разметке есть абсолютный URL с юникод-хостом:"; echo "$bad"; exit 1 ;;
   1) : ;;
   *) echo "::error::проверка юникод-хостов не отработала (grep rc=$rc): $bad"; exit 1 ;;
+esac
+
+# Предохранитель D-038 на уровне выхлопа, а не только на уровне вычитки глазами.
+#
+# Журнал грабель — самый вероятный источник утечки: поучительнее всего именно те
+# записи, где названы адреса и порты. Поэтому проверяем не лексику («бокс»,
+# «сервер» — законные слова), а конкретные формы: адрес IPv4 и явный порт.
+#
+# Коды grep различаем так же, как выше: 0 — нашли, 1 — чисто, >1 — проверка не
+# отработала и обязана падать.
+set +e
+# Порт ищем только в составе адреса (`//хост:3001`), а не любое `:NNNN`: в
+# RSC-данных страниц полно пар вида `"width":1280`, и широкий шаблон краснел на них.
+leak=$(grep -rEn '\b((25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\b|//[a-z0-9.-]+:[0-9]{2,5}\b' \
+  "$OUT" --include='*.html' --include='*.txt' --include='*.json' 2>&1)
+rc=$?
+set -e
+case "$rc" in
+  0) echo "::error::в выхлоп попал адрес или порт (предохранитель D-038):"; echo "$leak"; exit 1 ;;
+  1) : ;;
+  *) echo "::error::проверка на адреса не отработала (grep rc=$rc): $leak"; exit 1 ;;
 esac
 
 echo "экспорт полон: $(find "$OUT" -name '*.html' | wc -l) html-страниц"
