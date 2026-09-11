@@ -12,9 +12,24 @@ import { METRIKA_COUNTER_ID } from '@/content/site';
  * (`webvisor`, `clickmap`, `trackLinks`, `accurateTrackBounce`) — та, что кабинет
  * сгенерировал под включённые в нём опции; менять её здесь, не меняя настроек
  * счётчика, значит развести код и кабинет.
+ *
+ * Исключение — конструктор техзадания (решение владельца 2026-09-11): на документе,
+ * загруженном по его адресу, скрипт не запускается вовсе. Страница обещает, что
+ * ответы никуда не уходят, а Вебвизор записывает содержимое страницы и клики.
+ * Класс ym-hide-content этого не лечит: он размывает текст, но подсветка выбранных
+ * кнопок и места щелчков в записи остаются, а порядок вопросов публичный. Вдобавок
+ * автоцель «клик по email» ловит ссылку «Отправить почтой», в теле которой лежит
+ * весь черновик, — что из неё уходит в Метрику, документация не говорит.
+ * Решение принимается один раз на документ, поэтому на конструктор ведут только
+ * полные загрузки страницы (см. BriefBuilder). Параметры инициализации не тронуты —
+ * код с кабинетом не разведён. Пиксель в noscript остаётся: без скриптов конструктор
+ * не работает, и ответов, которые могли бы уйти, нет.
  */
+const NO_COUNTER_PATH = '/tehzadanie';
+
 export function Metrika() {
   const code = `
+  if (location.pathname.indexOf('${NO_COUNTER_PATH}') !== 0) {
    (function(m,e,t,r,i,k,a){
        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
        m[i].l=1*new Date();
@@ -23,6 +38,7 @@ export function Metrika() {
    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=${METRIKA_COUNTER_ID}', 'ym');
 
    ym(${METRIKA_COUNTER_ID}, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+  }
 `;
 
   return (
