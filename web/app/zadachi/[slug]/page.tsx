@@ -114,10 +114,11 @@ export default async function TaskPage({ params }: { params: Promise<Params> }) 
         </div>
         <div className="hero__actions">
           {/* Первый вопрос конструктора уже отмечен: со страницы задачи известно,
-              с чем человек пришёл. */}
-          <Link href={briefHrefForTask(task.slug)} className="btn btn--primary">
+              с чем человек пришёл. <a>, не Link: на конструктор — только полной
+              загрузкой, см. BriefBuilder. */}
+          <a href={briefHrefForTask(task.slug)} className="btn btn--primary">
             Собрать черновик по этой задаче
-          </Link>
+          </a>
           <Link href="/kontakty/" className="btn btn--ghost">
             Написать
           </Link>

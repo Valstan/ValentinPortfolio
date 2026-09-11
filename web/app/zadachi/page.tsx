@@ -31,7 +31,8 @@ export default function TasksPage() {
           </p>
         </div>
         <p className="note note--plain">
-          Не уверены, какая из них ваша? <Link href="/tehzadanie/">Соберите черновик техзадания</Link>{' '}
+          {/* <a>, не Link: на конструктор — только полной загрузкой, см. BriefBuilder */}
+          Не уверены, какая из них ваша? <a href="/tehzadanie/">Соберите черновик техзадания</a>{' '}
           — восемь вопросов, и задача опишется сама.
         </p>
         <div className="tasks">
