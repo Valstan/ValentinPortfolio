@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { shownAs } from '@/components/ArchDiagram';
 import { JsonLd } from '@/components/JsonLd';
 import { StatusBadge } from '@/components/StatusBadge';
 import { WorkCard } from '@/components/WorkCard';
@@ -18,6 +19,54 @@ const AS_OF_MANUAL = '5 августа 2026';
 const LIVE = VISIBLE_WORKS.filter((w) => w.prodUrl);
 const PENDING = VISIBLE_WORKS.filter((w) => w.status === 'каркас в проде');
 const NO_PUBLIC_URL = VISIBLE_WORKS.filter((w) => !w.prodUrl);
+
+/**
+ * Работы без адреса главная описывает словами в двух местах. Абзац под «адресами»
+ * собирается сам: название — из каталога, пояснение к нему — из этой карты по слагу,
+ * так что перестановка работ пару не разорвёт. А раздел «Чего здесь нет» набран руками
+ * и утверждает, кто из них показан кадрами, а кто схемой, — это и записано в `shown`.
+ * Сборка падает, если каталог разошёлся с картой: у работы без адреса нет пояснения,
+ * пояснение осталось у работы, получившей адрес, или показана она уже не тем, что
+ * утверждает раздел. Так уже было: «со схемами вместо скриншотов» стояло над Матрицей
+ * с девятью кадрами.
+ */
+const DESCRIBED_NO_URL: Record<string, { what: string; shown: 'кадры' | 'схема' }> = {
+  'matrica-rmz': { what: 'заводская учётная система', shown: 'кадры' },
+  sarafan: { what: 'внутренний сервис-редакция', shown: 'схема' },
+  karman: { what: 'личное приложение', shown: 'схема' },
+};
+
+(function assertHomeClaims() {
+  const fix = 'перепиши абзац под «адресами» и раздел «Чего здесь нет» в app/page.tsx';
+  for (const work of NO_PUBLIC_URL) {
+    const described = DESCRIBED_NO_URL[work.slug];
+    if (!described) {
+      throw new Error(`главная: «${work.title}» без публичного адреса, но словами не описана — ${fix}`);
+    }
+    const shown = shownAs(work);
+    if (shown !== described.shown) {
+      throw new Error(`главная: про «${work.title}» сказано «${described.shown}», а на витрине у неё «${shown}» — ${fix}`);
+    }
+  }
+  for (const slug of Object.keys(DESCRIBED_NO_URL)) {
+    if (!NO_PUBLIC_URL.some((w) => w.slug === slug)) {
+      throw new Error(`главная: «${slug}» описана как работа без адреса, но в каталоге её такой нет — ${fix}`);
+    }
+  }
+})();
+
+/** «А», «А и Б», «А, Б и В». */
+function listRu(items: string[]): string {
+  if (items.length < 2) return items.join('');
+  return `${items.slice(0, -1).join(', ')} и ${items[items.length - 1]}`;
+}
+
+const NO_URL_WHO = listRu(NO_PUBLIC_URL.map((w) => `${w.title} (${DESCRIBED_NO_URL[w.slug].what})`));
+const NO_URL_HOW = (['кадры', 'схема'] as const)
+  .map((form) => ({ form, titles: NO_PUBLIC_URL.filter((w) => shownAs(w) === form).map((w) => w.title) }))
+  .filter((group) => group.titles.length > 0)
+  .map((group) => `${listRu(group.titles)} — ${group.form === 'кадры' ? 'с экранами' : 'со схемами вместо скриншотов'}`)
+  .join(', ');
 
 /**
  * Числа первого экрана считаются ИЗ каталога, а не набиваются руками:
@@ -120,11 +169,12 @@ export default function HomePage() {
             а не жду красивой картинки — заказчику полезнее видеть, с чего начинается такой сайт.
           </p>
         )}
-        <p className="note note--plain">
-          {NO_PUBLIC_URL.map((w) => w.title).join(', ')} тоже работают, но публичного адреса не
-          имеют: заводская учётная система, внутренний сервис и личное приложение. Их разборы —
-          в каталоге работ, со схемами вместо скриншотов.
-        </p>
+        {NO_PUBLIC_URL.length > 0 && (
+          <p className="note note--plain">
+            {NO_URL_WHO} тоже работают, но публичного адреса не имеют. Их разборы — в каталоге
+            работ: {NO_URL_HOW}.
+          </p>
+        )}
       </section>
 
       {GROUP_ORDER.map((group) => {

@@ -4,6 +4,8 @@
  * Ноль внешних запросов, цвета — из тех же переменных, что и остальной сайт.
  */
 
+import type { Work } from '@/content/works';
+
 export type DiagramNode = { label: string; sub?: string };
 
 const DIAGRAMS: Record<string, { nodes: DiagramNode[]; caption: string }> = {
@@ -35,6 +37,17 @@ const DIAGRAMS: Record<string, { nodes: DiagramNode[]; caption: string }> = {
     ],
   },
 };
+
+/**
+ * Чем работа показана на витрине — по тому же правилу, что в карточке и на странице работы:
+ * кадры, если они есть; иначе схема, если она нарисована; иначе пустая рамка с причиной.
+ * Схема Матрицы нарисована, но не показывается: кадры идут первыми. Текст, обещающий
+ * «схему вместо снимка», может опираться только на это, а не на наличие записи в DIAGRAMS.
+ */
+export function shownAs(work: Pick<Work, 'slug' | 'shots'>): 'кадры' | 'схема' | 'ничего' {
+  if (work.shots) return 'кадры';
+  return DIAGRAMS[work.slug] ? 'схема' : 'ничего';
+}
 
 export function ArchDiagram({
   slug,
