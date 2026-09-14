@@ -80,6 +80,7 @@ export default async function WorkPage({ params }: { params: Promise<Params> }) 
                     <ShotFrame
                       key={shot.file}
                       dir={work.shots!.dir}
+                      asOf={work.shots!.asOf}
                       shot={shot}
                       title={work.title}
                       eager={i === 0}
@@ -95,6 +96,7 @@ export default async function WorkPage({ params }: { params: Promise<Params> }) 
                       <ShotFrame
                         key={shot.file}
                         dir={work.shots!.dir}
+                        asOf={work.shots!.asOf}
                         shot={shot}
                         title={work.title}
                         withCaption

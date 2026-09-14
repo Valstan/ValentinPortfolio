@@ -2,13 +2,17 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BriefBuilder } from '@/components/BriefBuilder';
 import { JsonLd } from '@/components/JsonLd';
-import { BRIEF_AS_OF, BRIEF_QUESTIONS } from '@/content/brief';
+import { BRIEF_AS_OF, BRIEF_QUESTIONS, BRIEF_TOPICS } from '@/content/brief';
 import { breadcrumbNode, graph, howToNode, webApplicationNode } from '@/lib/jsonld';
 import { pageMetadata } from '@/lib/metadata';
+import { capitalize, countPhrase } from '@/lib/ru';
 
 const TITLE = 'Черновик техзадания';
-const DESCRIPTION =
-  'Восемь вопросов, из которых собирается техзадание на разработку: что нужно, кто будет пользоваться, что уже есть, кто ведёт после запуска, сроки, персональные данные, деньги, что считать результатом. Считается в браузере, ответы никуда не отправляются.';
+// И число, и перечисление — из банка вопросов: набранные руками, они пережили бы
+// девятый вопрос молча и продолжили обещать состав, которого уже нет.
+const DESCRIPTION = `${capitalize(
+  countPhrase(BRIEF_QUESTIONS.length, ['вопрос', 'вопроса', 'вопросов']),
+)}, из которых собирается техзадание на разработку: ${BRIEF_TOPICS}. Считается в браузере, ответы никуда не отправляются.`;
 
 export const metadata: Metadata = pageMetadata({
   title: TITLE,

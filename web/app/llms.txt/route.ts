@@ -1,8 +1,10 @@
+import { BRIEF_QUESTIONS, BRIEF_TOPICS } from '@/content/brief';
 import { GOTCHAS } from '@/content/gotchas';
 import { absoluteUrl, CONTACTS, PERSON, SITE_HOST_DISPLAY } from '@/content/site';
 import { VISIBLE_WORKS, GROUP_ORDER, GROUP_TITLES } from '@/content/works';
 import { SERVICES } from '@/content/services';
 import { TASKS } from '@/content/tasks';
+import { countPhrase } from '@/lib/ru';
 
 // Карта сайта для ИИ-краулеров (#051). Генерируется из тех же данных, что и страницы, —
 // расходиться с сайтом не может. force-static: при output:'export' роут запекается в файл.
@@ -64,7 +66,9 @@ export function GET(): Response {
 
   lines.push('## Инструменты', '');
   lines.push(
-    `- [Черновик техзадания](${absoluteUrl('/tehzadanie/')}): восемь вопросов, из которых собирается техзадание на разработку — что нужно, кто пользуется, что уже есть, кто ведёт после запуска, сроки, персональные данные, деньги, что считать результатом. Считается в браузере, ответы никуда не отправляются; на выходе документ, который можно распечатать или отдать другому исполнителю. Полный список вопросов с пояснениями «зачем спрашиваю» — на самой странице и в ${absoluteUrl('/llms-full.txt')}.`,
+    // Число и состав — из банка вопросов, а не руками: модель цитирует эту строку
+    // дословно, и устаревший состав она повторит слово в слово.
+    `- [Черновик техзадания](${absoluteUrl('/tehzadanie/')}): ${countPhrase(BRIEF_QUESTIONS.length, ['вопрос', 'вопроса', 'вопросов'])}, из которых собирается техзадание на разработку — ${BRIEF_TOPICS}. Считается в браузере, ответы никуда не отправляются; на выходе документ, который можно распечатать или отдать другому исполнителю. Полный список вопросов с пояснениями «зачем спрашиваю» — на самой странице и в ${absoluteUrl('/llms-full.txt')}.`,
   );
   lines.push('');
 

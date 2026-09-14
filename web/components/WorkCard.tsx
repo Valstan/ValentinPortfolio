@@ -8,7 +8,12 @@ export function WorkCard({ work }: { work: Work }) {
   return (
     <Link href={`/raboty/${work.slug}/`} className="work-card">
       {work.shots ? (
-        <ShotFrame dir={work.shots.dir} shot={work.shots.items[0]} title={work.title} />
+        <ShotFrame
+          dir={work.shots.dir}
+          asOf={work.shots.asOf}
+          shot={work.shots.items[0]}
+          title={work.title}
+        />
       ) : (
         <ArchDiagram slug={work.slug} note={work.noScreenshotReason} compact />
       )}
