@@ -26,6 +26,9 @@ export default function robots(): MetadataRoute.Robots {
       ...AI_BOTS.map((userAgent) => ({ userAgent, allow: '/' })),
     ],
     sitemap: absoluteUrl('/sitemap.xml'),
-    host: absoluteUrl('/'),
+    // `Host:` не ставим намеренно: Яндекс отменил директиву в 2018 году и с тех пор
+    // определяет главное зеркало по 301 и `rel=canonical`. Строка в robots.txt ничего
+    // не решает, но читается как действующая настройка — и разойдётся с реальностью
+    // молча, если главное имя когда-нибудь сменится.
   };
 }

@@ -6,7 +6,7 @@ import { breadcrumbNode, graph } from '@/lib/jsonld';
 import { pageMetadata } from '@/lib/metadata';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Контакты',
+  title: 'Контакты: Малмыж и Кировская область',
   description: `Связаться с разработчиком: ${PERSON.name}, ${PERSON.areaServed}. Обсуждение задачи, сроков и стоимости — телефон, почта, Telegram.`,
   path: '/kontakty/',
 });

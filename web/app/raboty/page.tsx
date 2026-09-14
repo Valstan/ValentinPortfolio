@@ -7,7 +7,7 @@ import { breadcrumbNode, graph, itemListNode } from '@/lib/jsonld';
 import { pageMetadata } from '@/lib/metadata';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Работы',
+  title: 'Работы: системы в проде, Малмыж и область',
   description:
     'Каталог систем, доведённых до прода: сайты и порталы на Next.js и Payload CMS, настольная ERP на Electron, сервисы автоматизации на Python, мобильное PWA с пуш-уведомлениями. Заказчики — учреждения и бизнес Малмыжа и Кировской области.',
   path: '/raboty/',

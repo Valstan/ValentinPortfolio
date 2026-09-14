@@ -7,7 +7,7 @@ import { breadcrumbNode, faqPageNode, graph } from '@/lib/jsonld';
 import { pageMetadata } from '@/lib/metadata';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Задачи',
+  title: 'Задачи: с чем ко мне приходят, Малмыж',
   description:
     'С какой задачей приходят: сайт учреждению, перенос старого сайта без потери позиций, учётная система на предприятие, сайт события к дате, автоматизация публикаций, приложение без магазинов приложений. Кировская область и удалённо по России.',
   path: '/zadachi/',
