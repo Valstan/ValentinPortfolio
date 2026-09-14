@@ -13,6 +13,19 @@ name: CI
 # «не срабатывает», а навсегда блокирует влитие — GitHub вечно ждёт отчёта,
 # которого никто не пришлёт.
 
+# Версии actions держим на node24: раннеры с 19.09.2025 ругаются на Node 20 и уже
+# принудительно исполняют такие действия на Node 24 — предупреждение висело в каждом
+# прогоне. Подняты 14.09 до текущих мажоров, ломающие изменения каждого сверены:
+#   checkout v7 — блокирует checkout форка для `pull_request_target`/`workflow_run`;
+#     у нас `pull_request`, не задевает;
+#   setup-node v7 — в v6 урезали АВТОМАТИЧЕСКОЕ кеширование; у нас `cache: pnpm`
+#     задан явно, а явный вход поддерживается по-прежнему;
+#   upload-artifact v7 — «прямая загрузка» без zip включается `archive: false`,
+#     по умолчанию всё как было;
+#   download-artifact v8 — понимает и zip, и прямые (смотрит Content-Type), поэтому
+#     пара v7+v8 сходится; несовместимость по мажорам была только между v3 и v4;
+#   pnpm/action-setup v6 — добавил поддержку pnpm 11, мы пиним `version: 10`.
+
 on:
   pull_request:
   workflow_dispatch:
@@ -29,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # Полная история обязательна: без неё gitleaks смотрит один коммит и
           # гейт зелен ровно в том сценарии, ради которого ставится, — секрет,
@@ -54,11 +67,11 @@ jobs:
             | tar xz -C /tmp gitleaks
           /tmp/gitleaks git . --no-banner --redact --exit-code 1
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 10
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
