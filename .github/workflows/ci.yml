@@ -73,7 +73,11 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          # Node 24: тот же мажор, на котором проект собирается на машине разработки.
+          # Расхождение CI с локальной машиной — самостоятельный риск: грабля 1 этого
+          # handoff (Next 15.5.4 не собирал static export на Windows) нашлась ровно на
+          # таком расхождении. 24 — активная LTS, actions с 19.09.2025 уже на ней.
+          node-version: 24
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
 
