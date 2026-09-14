@@ -6,6 +6,7 @@ import { WorkCard } from '@/components/WorkCard';
 import { TASKS } from '@/content/tasks';
 import { GROUP_ORDER, GROUP_TITLES, VISIBLE_WORKS, workBySlug } from '@/content/works';
 import { graph, profilePageNode } from '@/lib/jsonld';
+import { capitalize, countPhrase, listRu } from '@/lib/ru';
 
 /**
  * Дата замера — только для чисел, набранных руками. Числа, которые считаются из
@@ -17,7 +18,12 @@ const AS_OF_MANUAL = '5 августа 2026';
 
 /** Всё, что открывается по своему адресу, — включая каркасы: они тоже отвечают. */
 const LIVE = VISIBLE_WORKS.filter((w) => w.prodUrl);
-const PENDING = VISIBLE_WORKS.filter((w) => w.status === 'каркас в проде');
+/**
+ * Каркасы считаются ИЗ `LIVE`, а не из каталога: абзац под сеткой объясняет янтарные
+ * значки в ней самой. Каркас без публичного адреса в сетку не попадает, и упоминать
+ * его там — обещать значок, которого читатель не найдёт.
+ */
+const PENDING = LIVE.filter((w) => w.status === 'каркас в проде');
 const NO_PUBLIC_URL = VISIBLE_WORKS.filter((w) => !w.prodUrl);
 
 /**
@@ -54,12 +60,6 @@ const DESCRIBED_NO_URL: Record<string, { what: string; shown: 'кадры' | 'с
     }
   }
 })();
-
-/** «А», «А и Б», «А, Б и В». */
-function listRu(items: string[]): string {
-  if (items.length < 2) return items.join('');
-  return `${items.slice(0, -1).join(', ')} и ${items[items.length - 1]}`;
-}
 
 const NO_URL_WHO = listRu(NO_PUBLIC_URL.map((w) => `${w.title} (${DESCRIBED_NO_URL[w.slug].what})`));
 const NO_URL_HOW = (['кадры', 'схема'] as const)
@@ -128,8 +128,16 @@ export default function HomePage() {
           <span className="section__kicker">Начните отсюда</span>
           <h2>С какой задачей вы пришли</h2>
           <p className="section__lede">
-            Шесть формулировок задач, а не список технологий. За каждой — система, которая уже
-            работает.
+            {/* Число и форма слова — из длины каталога задач: набранное руками «Шесть» пережило
+                бы седьмую задачу молча (пункт 11 «хрупких мест»). */}
+            {capitalize(
+              countPhrase(
+                TASKS.length,
+                ['формулировка задач', 'формулировки задач', 'формулировок задач'],
+                'f',
+              ),
+            )}
+            , а не список технологий. За каждой — система, которая уже работает.
           </p>
         </div>
         <div className="tasks">
@@ -164,9 +172,18 @@ export default function HomePage() {
           ))}
         </div>
         {PENDING.length > 0 && (
+          /*
+            Абзац спал: сейчас каркасов нет ни одного, а написан он был под два учреждения —
+            «сайты… их… учреждения» во множественном и `join(' и ')`, который на трёх работах
+            дал бы «А и Б и В». Проснулся бы враньём. Теперь согласование считается из длины
+            списка, перечисление идёт через `listRu`, а кто заказчик — не утверждается вовсе:
+            каркас бывает и не у учреждения.
+          */
           <p className="note">
-            {PENDING.map((w) => w.prodLabel).join(' и ')} помечены янтарным намеренно: сайты
-            открыты и работают, но учреждения ещё не наполнили их контентом. Показываю как есть,
+            {listRu(PENDING.map((w) => w.prodLabel!))}{' '}
+            {PENDING.length === 1 ? 'помечен' : 'помечены'} янтарным намеренно:{' '}
+            {PENDING.length === 1 ? 'он открыт и работает' : 'они открыты и работают'}, но
+            контентом {PENDING.length === 1 ? 'его' : 'их'} ещё не наполнили. Показываю как есть,
             а не жду красивой картинки — заказчику полезнее видеть, с чего начинается такой сайт.
           </p>
         )}

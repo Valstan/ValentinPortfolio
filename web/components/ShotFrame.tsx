@@ -7,17 +7,24 @@ import type { Shot } from '@/content/works';
  */
 export function ShotFrame({
   dir,
+  asOf,
   shot,
   title,
   eager = false,
   withCaption = false,
 }: {
   dir: string;
+  /** ISO-дата съёмки из каталога: из неё берётся год в `alt`. */
+  asOf: string;
   shot: Shot;
   title: string;
   eager?: boolean;
   withCaption?: boolean;
 }) {
+  // Год — из каталога, а не числом в коде. «Снимок 2026 года» стояло здесь одинаковым
+  // для всех кадров и никогда бы само не обновилось: первая пересъёмка в 2027-м сделала
+  // бы подпись ложной разом у всех работ, не уронив ни сборку, ни тесты.
+  const shotYear = asOf.slice(0, 4);
   const wide = shot.ratio === 'wide';
   const frame = (
     <div className={wide ? 'shot' : 'shot shot--phone'}>
@@ -33,7 +40,7 @@ export function ShotFrame({
       )}
       <img
         src={`/shots/${dir}/${shot.file}`}
-        alt={`${title}: ${shot.caption.toLowerCase()}. Снимок 2026 года`}
+        alt={`${title}: ${shot.caption.toLowerCase()}. Снимок ${shotYear} года`}
         width={wide ? 1280 : 750}
         height={wide ? 800 : 1440}
         loading={eager ? 'eager' : 'lazy'}

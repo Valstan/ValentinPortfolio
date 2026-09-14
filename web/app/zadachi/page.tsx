@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { JsonLd } from '@/components/JsonLd';
+import { BRIEF_QUESTIONS } from '@/content/brief';
 import { TASKS } from '@/content/tasks';
 import { workBySlug } from '@/content/works';
 import { breadcrumbNode, faqPageNode, graph } from '@/lib/jsonld';
 import { pageMetadata } from '@/lib/metadata';
+import { capitalize, countPhrase } from '@/lib/ru';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Задачи: с чем ко мне приходят, Малмыж',
@@ -26,14 +28,17 @@ export default function TasksPage() {
         <div className="section__head">
           <h1>С какой задачей вы пришли</h1>
           <p className="section__lede">
-            Шесть типов задач, с которыми ко мне обращаются. У каждой — своя страница: как задача
-            выглядит изнутри организации, что я по ней делаю, где это уже сделано и за какой срок.
+            {/* Из длины каталога задач, а не руками — см. app/page.tsx. */}
+            {capitalize(countPhrase(TASKS.length, ['тип задач', 'типа задач', 'типов задач']))}, с
+            которыми ко мне обращаются. У каждой — своя страница: как задача выглядит изнутри
+            организации, что я по ней делаю, где это уже сделано и за какой срок.
           </p>
         </div>
         <p className="note note--plain">
           {/* <a>, не Link: на конструктор — только полной загрузкой, см. BriefBuilder */}
-          Не уверены, какая из них ваша? <a href="/tehzadanie/">Соберите черновик техзадания</a>{' '}
-          — восемь вопросов, и задача опишется сама.
+          Не уверены, какая из них ваша? <a href="/tehzadanie/">Соберите черновик техзадания</a> —{' '}
+          {countPhrase(BRIEF_QUESTIONS.length, ['вопрос', 'вопроса', 'вопросов'])}, и задача
+          опишется сама.
         </p>
         <div className="tasks">
           {TASKS.map((task) => (
