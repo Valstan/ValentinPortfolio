@@ -1,5 +1,10 @@
 // Классы задач — «чем могу быть полезен». Отдельный файл: витрина работ и витрина услуг
 // меняются независимо друг от друга.
+//
+// Целостность `proof` проверяется на импорте модуля (внизу файла) — то есть при
+// `next build`, то есть на PR-гейте.
+
+import { workBySlug } from '@/content/works';
 
 export type Service = {
   id: string;
@@ -68,3 +73,40 @@ export const SERVICES: Service[] = [
     proof: ['gonba', 'vmalmyzhe'],
   },
 ];
+
+/**
+ * Целостность проверяется на импорте модуля, то есть при `next build`, то есть
+ * на PR-гейте. Тот же приём, что `assertBrief` в `brief.ts`.
+ *
+ * Зачем: страница `/uslugi/` обещает читателю «за каждым классом стоит уже
+ * запущенная система, которую можно открыть и посмотреть». Доказательства
+ * названы слагом, а `workBySlug` смотрит в `VISIBLE_WORKS` — стоит работе
+ * скрыться (`hidden: true`) или уйти из каталога, как ссылка молча превращается
+ * в пустоту: `service.proof.map(...)` возвращает `null`, пункт исчезает, ошибки
+ * нет. Ровно так `rmz-site` с 04.09 по 14.09 оставался доказательством у двух
+ * классов («Сайты и порталы под ключ», «Вывод в прод и эксплуатация») уже после
+ * того, как работу скрыли. Пусть лучше не собирается сборка.
+ */
+(function assertServices() {
+  const seen = new Set<string>();
+
+  for (const service of SERVICES) {
+    if (seen.has(service.id)) {
+      throw new Error(`services: дублирующийся id класса «${service.id}»`);
+    }
+    seen.add(service.id);
+
+    if (service.proof.length === 0) {
+      throw new Error(
+        `services: у класса «${service.id}» нет ни одного доказательства, а /uslugi/ обещает систему за каждым классом`,
+      );
+    }
+    for (const slug of service.proof) {
+      if (!workBySlug(slug)) {
+        throw new Error(
+          `services: класс «${service.id}» ссылается на работу «${slug}», которой нет на витрине (снята, скрыта или переименована)`,
+        );
+      }
+    }
+  }
+})();

@@ -1,5 +1,10 @@
 // Слой спроса: одна страница = один вопрос заказчика. URL, заголовок и запрос совпадают —
 // это единица извлечения для языковых моделей, которые не ранжируют, а цитируют.
+//
+// Целостность `proof` проверяется на импорте модуля (внизу файла) — то есть при
+// `next build`, то есть на PR-гейте.
+
+import { workBySlug } from '@/content/works';
 
 export type Task = {
   slug: string;
@@ -137,3 +142,38 @@ export const TASKS: Task[] = [
 export function taskBySlug(slug: string): Task | undefined {
   return TASKS.find((t) => t.slug === slug);
 }
+
+/**
+ * Целостность проверяется на импорте модуля, то есть при `next build`, то есть
+ * на PR-гейте. Тот же приём, что `assertBrief` в `brief.ts` и `assertServices`
+ * в `services.ts`.
+ *
+ * Зачем: строку «где сделано» собирают из `proof` через `workBySlug` и главная,
+ * и `/zadachi/`, и страница задачи, и `llms-full.txt` — а `workBySlug` смотрит в
+ * `VISIBLE_WORKS`. Работу скрыли или убрали из каталога — пункт молча исчезает
+ * (`.filter(Boolean)`), а на главной `workBySlug(task.proof[0])` становится
+ * `undefined` и карточка остаётся без ссылки. Пусть лучше не собирается сборка.
+ */
+(function assertTasks() {
+  const seen = new Set<string>();
+
+  for (const task of TASKS) {
+    if (seen.has(task.slug)) {
+      throw new Error(`tasks: дублирующийся слаг задачи «${task.slug}»`);
+    }
+    seen.add(task.slug);
+
+    if (task.proof.length === 0) {
+      throw new Error(
+        `tasks: у задачи «${task.slug}» нет ни одного доказательства, а страница обещает показать, где это уже сделано`,
+      );
+    }
+    for (const slug of task.proof) {
+      if (!workBySlug(slug)) {
+        throw new Error(
+          `tasks: задача «${task.slug}» ссылается на работу «${slug}», которой нет на витрине (снята, скрыта или переименована)`,
+        );
+      }
+    }
+  }
+})();
