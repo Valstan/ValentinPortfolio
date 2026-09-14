@@ -8,6 +8,16 @@ import { absoluteUrl, OG_IMAGE, PERSON, SITE_ORIGIN } from '@/content/site';
 import { graph, personNode, websiteNode } from '@/lib/jsonld';
 
 const title = `${PERSON.name} — ${PERSON.jobTitle.toLowerCase()}`;
+
+/**
+ * Заголовок главной отличается от бренд-строки намеренно (14.09, п. 3 чек-листа
+ * SEO/GEO Мозга от 12.09). «Full-cycle разработчик» — как владелец себя называет, и
+ * это остаётся в h1, в `jobTitle` и в JSON-LD. Но искать так не будут: живой запрос,
+ * названный владельцем, — «разработчик сайтов Малмыж». В `<title>` нужны слова из
+ * запроса, поэтому здесь — ремесло и место, а самоназвание живёт на странице.
+ */
+const seoTitle = `${PERSON.name} — разработчик сайтов и учётных систем, Малмыж`;
+
 /**
  * География — в самом описании, а не только в поле `areaServed`: по запросу вида
  * «разработчик сайтов Кировская область» сайту раньше было нечем совпасть ни в
@@ -19,7 +29,7 @@ const description =
 export const metadata: Metadata = {
   // Все относительные URL в метаданных резолвятся от punycode-origin (G133/G134).
   metadataBase: new URL(SITE_ORIGIN),
-  title: { default: `${title}, Кировская область`, template: `%s — ${PERSON.name}` },
+  title: { default: seoTitle, template: `%s — ${PERSON.name}` },
   description,
   applicationName: title,
   authors: [{ name: PERSON.name, url: absoluteUrl('/') }],

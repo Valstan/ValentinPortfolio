@@ -7,7 +7,7 @@ import { breadcrumbNode, graph, offerCatalogNode } from '@/lib/jsonld';
 import { pageMetadata } from '@/lib/metadata';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Услуги',
+  title: 'Услуги: сайты и учётные системы, Малмыж',
   description:
     'Сайты и порталы под ключ, настольные учётные системы, сервисы автоматизации, мобильные PWA с пуш-уведомлениями, единый вход и 152-ФЗ, вывод в прод на российских серверах. Кировская область и удалённо по России.',
   path: '/uslugi/',

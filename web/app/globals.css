@@ -1,66 +1,27 @@
 /* Дизайн-токены. Внешних шрифтов и CDN нет намеренно: static export за nginx, ноль внешних запросов. */
 
+/*
+ * Здесь только то, что не зависит от палитры: шрифты, шаг сетки, ширины.
+ * Цвета живут ОДНИМ блоком ниже — «светлая инженерная готика», и там же
+ * `@media (prefers-color-scheme: dark)` намеренно повторяет светлую палитру:
+ * тёмной темы у сайта нет, и у пользователя с тёмной системой он всё равно
+ * должен выглядеть так, как задуман.
+ *
+ * До 14.09 выше лежала вторая, более ранняя палитра (23 токена) и полный тёмный
+ * блок (21 токен) — все 44 перекрывались нижним блоком по порядку в файле и не
+ * влияли ни на один пиксель. Они читались как действующая тёмная тема и врали:
+ * правку цвета в них было видно в diff и не видно на экране. Удалены; действующие
+ * значения сверены до и после — совпали все 33, кроме сознательно поднятого
+ * контраста `--text-faint`.
+ */
 :root {
-  color-scheme: light dark;
-
   --font-sans: ui-sans-serif, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     'PT Sans', 'Noto Sans', sans-serif;
   --font-mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono', Menlo, Consolas, monospace;
 
-  --bg: #ffffff;
-  --bg-raised: #ffffff;
-  --bg-sunken: #f4f5f7;
-  --text: #101418;
-  --text-muted: #59626e;
-  --text-faint: #7c8695;
-  --border: #e3e6eb;
-  --border-strong: #c9cfd8;
-  --accent: #1d4ed8;
-  --accent-hover: #1e40af;
-  --accent-soft: #eaf0fe;
-  --on-accent: #ffffff;
-  --accent-btn-bg: #1d4ed8;
-  --ok: #067647;
-  --ok-soft: #e7f5ee;
-  --warn: #b45309;
-  --warn-soft: #fdf3e3;
-  --neutral-badge: #3f4a5a;
-  --neutral-badge-soft: #edeff3;
-
-  --radius: 10px;
-  --radius-lg: 16px;
-  --shadow: 0 1px 2px rgba(26, 26, 23, 0.05), 0 4px 16px rgba(26, 26, 23, 0.05);
-  --shadow-lift: 0 2px 4px rgba(26, 26, 23, 0.06), 0 12px 32px rgba(26, 26, 23, 0.09);
-
   --step: 8px;
   --page-max: 1120px;
   --prose-max: 68ch;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --accent-btn-bg: #2e5bd6;
-    --bg: #0c0f14;
-    --bg-raised: #141922;
-    --bg-sunken: #10151d;
-    --text: #e8ecf2;
-    --text-muted: #98a2b3;
-    --text-faint: #79839a;
-    --border: #232b36;
-    --border-strong: #333d4c;
-    --accent: #7aa2ff;
-    --accent-hover: #9cbaff;
-    --accent-soft: #16203a;
-    --on-accent: #ffffff;
-    --ok: #34d399;
-    --ok-soft: #0f2a20;
-    --warn: #fbbf24;
-    --warn-soft: #2a2110;
-    --neutral-badge: #aeb8c7;
-    --neutral-badge-soft: #1b222d;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
-    --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.45);
-  }
 }
 
 *,
@@ -1065,7 +1026,7 @@ ul {
   --bg-sunken: #f2eddf;
   --text: #20213a;
   --text-muted: #5d5d74;
-  --text-faint: #818096;
+  --text-faint: #717087;
   --border: #dcd4c1;
   --border-strong: #a99a78;
   --accent: #5b3fc4;
@@ -1097,7 +1058,7 @@ ul {
     --bg-sunken: #f2eddf;
     --text: #20213a;
     --text-muted: #5d5d74;
-    --text-faint: #818096;
+    --text-faint: #717087;
     --border: #dcd4c1;
     --border-strong: #a99a78;
     --accent: #5b3fc4;
