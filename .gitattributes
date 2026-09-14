@@ -1,0 +1,5 @@
+# `shots-generated.ts` пишет скрипт сборки (web/scripts/gen-shots.mjs) — всегда с LF.
+# Без этой строки под core.autocrlf=true рабочая копия держится в CRLF, и КАЖДАЯ
+# локальная сборка помечала файл изменённым, хотя содержимое то же: `git status`
+# показывал правку, `git diff` — пустоту. Такой шум приучает не смотреть в status.
+web/content/shots-generated.ts text eol=lf
