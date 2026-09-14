@@ -1,15 +1,34 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { JsonLd } from '@/components/JsonLd';
-import { SERVICES } from '@/content/services';
+import { SERVICE_TOPICS, SERVICES } from '@/content/services';
 import { workBySlug } from '@/content/works';
 import { breadcrumbNode, graph, offerCatalogNode } from '@/lib/jsonld';
 import { pageMetadata } from '@/lib/metadata';
+import { capitalize } from '@/lib/ru';
+
+/**
+ * Состав — из каталога услуг, а не руками: перечисление здесь не сверялось ни с чем,
+ * и седьмой класс в него бы не попал. То же, что в описании `/zadachi/`.
+ */
+const DESCRIPTION = `${capitalize(SERVICE_TOPICS)}. Кировская область и удалённо по России.`;
+
+/*
+  Потолок длины — как у `/zadachi/`: собранное из данных описание растёт вместе
+  с каталогом, а поисковик обрежет его на своё усмотрение, и обрыв придётся на середину
+  перечисления. Пусть это заметит тот, кто добавляет класс услуг, а не читатель выдачи.
+  Текущая длина — 210 знаков.
+*/
+const DESCRIPTION_LIMIT = 320;
+if (DESCRIPTION.length > DESCRIPTION_LIMIT) {
+  throw new Error(
+    `/uslugi/: описание разрослось до ${DESCRIPTION.length} знаков при потолке ${DESCRIPTION_LIMIT} — перепиши фразу в app/uslugi/page.tsx, а не удлиняй перечисление`,
+  );
+}
 
 export const metadata: Metadata = pageMetadata({
   title: 'Услуги: сайты и учётные системы, Малмыж',
-  description:
-    'Сайты и порталы под ключ, настольные учётные системы, сервисы автоматизации, мобильные PWA с пуш-уведомлениями, единый вход и 152-ФЗ, вывод в прод на российских серверах. Кировская область и удалённо по России.',
+  description: DESCRIPTION,
   path: '/uslugi/',
 });
 
