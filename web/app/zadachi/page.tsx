@@ -2,16 +2,34 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { JsonLd } from '@/components/JsonLd';
 import { BRIEF_QUESTIONS } from '@/content/brief';
-import { TASKS } from '@/content/tasks';
+import { TASK_TOPICS, TASKS } from '@/content/tasks';
 import { workBySlug } from '@/content/works';
 import { breadcrumbNode, faqPageNode, graph } from '@/lib/jsonld';
 import { pageMetadata } from '@/lib/metadata';
 import { capitalize, countPhrase } from '@/lib/ru';
 
+/**
+ * Состав — из каталога задач, а не руками: перечисление здесь было последней копией
+ * витрины, которая не сверялась ни с чем, и седьмая задача в него бы не попала.
+ */
+const DESCRIPTION = `С какой задачей приходят: ${TASK_TOPICS}. Кировская область и удалённо по России.`;
+
+/*
+  Мета-описание, собранное из данных, растёт вместе с каталогом — а поисковик обрежет
+  его на своё усмотрение, и обрыв придётся на середину перечисления. Потолок здесь
+  затем, чтобы это заметил не читатель выдачи, а тот, кто добавляет задачу: значит,
+  пора переписать фразу, а не удлинять список. Текущая длина — 240 знаков.
+*/
+const DESCRIPTION_LIMIT = 320;
+if (DESCRIPTION.length > DESCRIPTION_LIMIT) {
+  throw new Error(
+    `/zadachi/: описание разрослось до ${DESCRIPTION.length} знаков при потолке ${DESCRIPTION_LIMIT} — перепиши фразу в app/zadachi/page.tsx, а не удлиняй перечисление`,
+  );
+}
+
 export const metadata: Metadata = pageMetadata({
   title: 'Задачи: с чем ко мне приходят, Малмыж',
-  description:
-    'С какой задачей приходят: сайт учреждению, перенос старого сайта без потери позиций, учётная система на предприятие, сайт события к дате, автоматизация публикаций, приложение без магазинов приложений. Кировская область и удалённо по России.',
+  description: DESCRIPTION,
   path: '/zadachi/',
 });
 
