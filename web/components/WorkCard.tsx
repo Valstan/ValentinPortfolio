@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArchDiagram } from '@/components/ArchDiagram';
-import { ShotFrame } from '@/components/ShotFrame';
+import { ShotFrame, SHOT_SIZES } from '@/components/ShotFrame';
 import { StatusBadge } from '@/components/StatusBadge';
 import type { Work } from '@/content/works';
 
@@ -13,6 +13,7 @@ export function WorkCard({ work }: { work: Work }) {
           asOf={work.shots.asOf}
           shot={work.shots.items[0]}
           title={work.title}
+          sizes={SHOT_SIZES.card}
         />
       ) : (
         <ArchDiagram slug={work.slug} note={work.noScreenshotReason} compact />

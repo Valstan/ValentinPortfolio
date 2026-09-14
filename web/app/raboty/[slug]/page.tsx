@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArchDiagram } from '@/components/ArchDiagram';
 import { FactColumns } from '@/components/FactList';
 import { JsonLd } from '@/components/JsonLd';
-import { ShotFrame } from '@/components/ShotFrame';
+import { ShotFrame, SHOT_SIZES } from '@/components/ShotFrame';
 import { StatusBadge } from '@/components/StatusBadge';
 import { VISIBLE_WORKS, workBySlug } from '@/content/works';
 import { breadcrumbNode, creativeWorkNode, graph } from '@/lib/jsonld';
@@ -85,6 +85,7 @@ export default async function WorkPage({ params }: { params: Promise<Params> }) 
                       title={work.title}
                       eager={i === 0}
                       withCaption
+                      sizes={SHOT_SIZES.wide}
                     />
                   ))}
               </div>
@@ -100,6 +101,7 @@ export default async function WorkPage({ params }: { params: Promise<Params> }) 
                         shot={shot}
                         title={work.title}
                         withCaption
+                        sizes={SHOT_SIZES.phone}
                       />
                     ))}
                 </div>
