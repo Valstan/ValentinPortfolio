@@ -1415,6 +1415,7 @@ main { position: relative; }
 .task-tile:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
 .task-tile:hover::after { transform: rotate(-30deg); background: var(--accent-soft); }
 .task-tile__q { font-family: var(--font-display); font-size: 1.18rem; color: #302551; padding-right: 28px; }
+.task-tile__price { font-weight: 700; color: #302551; }
 .task-tile__where { padding-right: 38px; border-top: 1px solid rgba(179,123,25,.22); }
 
 .live-grid { gap: 12px; }

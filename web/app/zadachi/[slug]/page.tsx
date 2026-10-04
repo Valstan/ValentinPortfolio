@@ -71,6 +71,11 @@ export default async function TaskPage({ params }: { params: Promise<Params> }) 
           <h2>Сроки</h2>
           <p>{task.timeline}</p>
 
+          <h2>Сколько стоит</h2>
+          <p>
+            Вилка вниз — {task.priceFrom}; точная цена — после разговора о задаче.
+          </p>
+
           {task.notDoing && (
             <>
               <h2>Чего не делаю</h2>

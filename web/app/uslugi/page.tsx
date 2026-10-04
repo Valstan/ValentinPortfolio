@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { JsonLd } from '@/components/JsonLd';
 import { SERVICE_TOPICS, SERVICES } from '@/content/services';
+import { TASKS } from '@/content/tasks';
 import { workBySlug } from '@/content/works';
 import { breadcrumbNode, graph, offerCatalogNode } from '@/lib/jsonld';
 import { pageMetadata } from '@/lib/metadata';
@@ -69,6 +70,29 @@ export default function ServicesPage() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="wrap section">
+        <div className="section__head">
+          <span className="section__kicker">Честно про деньги</span>
+          <h2>Сколько стоит</h2>
+          <p className="section__lede">
+            Вилки вниз по классам задач — точная цена после разговора о вашей задаче.
+          </p>
+        </div>
+        {/*
+          Цены — из задач, а не руками: вилка обязана стоять у каждой задачи
+          (`assertTasks`), иначе седьмая задача останется без цены молча.
+        */}
+        <div className="prose">
+          <ul>
+            {TASKS.map((task) => (
+              <li key={task.slug}>
+                <strong>{capitalize(task.topic)}</strong> — {task.priceFrom}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

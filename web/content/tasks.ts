@@ -29,6 +29,11 @@ export type Task = {
   notDoing?: string;
   /** Ориентир по срокам. */
   timeline: string;
+  /**
+   * Вилка «от» словами владельца (решение 04.10) — точная цена после разговора
+   * о задаче. Обязательна: иначе седьмая задача молча останется без цены.
+   */
+  priceFrom: string;
 };
 
 export const TASKS: Task[] = [
@@ -53,6 +58,7 @@ export const TASKS: Task[] = [
     // и строка «где сделано» молча потеряет пункт.
     proof: ['dom-kultury', 'gonba', 'vmalmyzhe'],
     timeline: 'Каркас на своём домене — недели, а не месяцы: стек и решения переиспользуются с соседних сайтов.',
+    priceFrom: 'от 20000 ₽',
   },
   {
     slug: 'perenos-starogo-sayta',
@@ -77,6 +83,7 @@ export const TASKS: Task[] = [
     proof: ['sabantuy-malmyzh', 'dom-kultury'],
     timeline:
       'Сайт на 100–150 страниц реально перенести за день-два — это мой замер на такой работе; она на витрине не показывается по решению заказчика, поэтому проверить утверждение снаружи нельзя.',
+    priceFrom: 'от 10000 ₽',
   },
   {
     slug: 'uchetnaya-sistema',
@@ -96,6 +103,7 @@ export const TASKS: Task[] = [
     proof: ['matrica-rmz'],
     notDoing: 'Не берусь за внедрение и доработку 1С — это отдельная профессия, и честнее сказать сразу.',
     timeline: 'Такие системы не делаются «под ключ за месяц»: сначала один участок учёта в работе, дальше по очереди.',
+    priceFrom: 'от 30000 ₽',
   },
   {
     slug: 'sayt-sobytiya',
@@ -114,6 +122,7 @@ export const TASKS: Task[] = [
     ],
     proof: ['sabantuy-malmyzh', 'yarmarka-kazanskaya'],
     timeline: 'Под дату — да: сайт Ярмарки собран переиспользованием готовых решений соседнего проекта.',
+    priceFrom: 'от 5000 ₽',
   },
   {
     slug: 'avtomatizaciya-publikacij',
@@ -132,6 +141,7 @@ export const TASKS: Task[] = [
     ],
     proof: ['sarafan'],
     timeline: 'Первый работающий конвейер — недели; дальше добавляются источники и каналы.',
+    priceFrom: 'от 5000 ₽',
   },
   {
     slug: 'prilozhenie-bez-magazinov',
@@ -151,6 +161,7 @@ export const TASKS: Task[] = [
     proof: ['trener'],
     notDoing: 'Нативных приложений для публикации в магазинах не делаю — если это принципиально, лучше искать другого исполнителя.',
     timeline: 'Первый рабочий релиз — месяцы, потому что роли и данные людей делаются аккуратно.',
+    priceFrom: 'от 20000 ₽',
   },
 ];
 
@@ -197,6 +208,12 @@ export const TASK_TOPICS: string = TASKS.map((task) => task.topic).join(', ');
       throw new Error(
         `tasks: тема задачи «${task.slug}» содержит запятую — перечисление склеивается запятыми и распадётся на лишние пункты`,
       );
+    }
+
+    // Без вилки задача молча останется без цены на /uslugi/, /zadachi/ и в
+    // черновике — а витрина обещает ответ «сколько стоит».
+    if (!task.priceFrom.trim()) {
+      throw new Error(`tasks: у задачи «${task.slug}» пустая вилка цены — она выведет пустую строку вместо «от …»`);
     }
 
     if (task.proof.length === 0) {
