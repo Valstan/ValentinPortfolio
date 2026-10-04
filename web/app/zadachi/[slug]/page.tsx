@@ -73,7 +73,7 @@ export default async function TaskPage({ params }: { params: Promise<Params> }) 
 
           <h2>Сколько стоит</h2>
           <p>
-            Вилка вниз — {task.priceFrom}; точная цена — после разговора о задаче.
+            Ориентир — {task.priceFrom}; точная цена — после оценки ТЗ.
           </p>
 
           {task.notDoing && (

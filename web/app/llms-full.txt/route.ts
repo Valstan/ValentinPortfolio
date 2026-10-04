@@ -40,7 +40,7 @@ export function GET(): Response {
     out.push('', 'Что я делаю:');
     for (const a of task.approach) out.push(`- ${a}`);
     out.push('', `Сроки: ${task.timeline}`);
-    out.push(`Вилка цены: ${task.priceFrom} (точная — после разговора о задаче)`);
+    out.push(`Вилка цены: ${task.priceFrom} (точная — после оценки ТЗ)`);
     if (task.notDoing) out.push(`Чего не делаю: ${task.notDoing}`);
     out.push('', `Где сделано: ${proofList(task.proof)}`, '');
   }
