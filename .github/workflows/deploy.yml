@@ -132,7 +132,7 @@ jobs:
           set -e
           SSH="ssh -i ~/.ssh/id_deploy -o IdentitiesOnly=yes -p $SSH_PORT $SSH_USER@$SSH_HOST"
           get() { $SSH "curl -fsS --max-time 15 -H 'Host: $SITE_HOST' http://127.0.0.1$1"; }
-          need() { echo "$1" | grep -q "$2" || { echo "::error::$3"; exit 1; }; }
+          need() { case "$1" in *"$2"*) ;; *) echo "::error::$3"; exit 1;; esac; }  # G322/G355: case вместо 'echo | grep -q' — под pipefail grep выходит по EPIPE и конвейер врёт
 
           home=$(get /)
           need "$home" 'Савиных'            'главная без подписи автора'
@@ -157,9 +157,10 @@ jobs:
           SITE: ${{ secrets.SITE_URL }}
         run: |
           if body=$(curl -fsSL --max-time 30 --retry 3 --retry-delay 10 --retry-all-errors "$SITE/"); then
-            echo "$body" | grep -q 'Савиных' \
-              && echo "снаружи сайт отвечает и содержит подпись" \
-              || echo "::warning::снаружи ответ получен, но подписи в нём нет"
+            case "$body" in  # G322: без grep -q, как в need() выше
+              *Савиных*) echo "снаружи сайт отвечает и содержит подпись" ;;
+              *) echo "::warning::снаружи ответ получен, но подписи в нём нет" ;;
+            esac
           else
             echo "::warning::снаружи достучаться не удалось (маршрут раннера до РФ), смоук на боксе пройден"
           fi
