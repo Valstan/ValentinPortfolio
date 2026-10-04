@@ -62,6 +62,7 @@ export default function TasksPage() {
           {TASKS.map((task) => (
             <Link key={task.slug} href={`/zadachi/${task.slug}/`} className="task-tile">
               <span className="task-tile__q">{task.question}</span>
+              <span className="task-tile__price">{task.priceFrom}</span>
               <span className="task-tile__where">
                 где сделано: {task.proof.map((s) => workBySlug(s)?.title).filter(Boolean).join(' · ')}
               </span>
