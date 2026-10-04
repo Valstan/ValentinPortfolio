@@ -78,7 +78,7 @@ export default function ServicesPage() {
           <span className="section__kicker">Честно про деньги</span>
           <h2>Сколько стоит</h2>
           <p className="section__lede">
-            Вилки вниз по классам задач — точная цена после разговора о вашей задаче.
+            Ориентиры по классам задач — точная цена после оценки ТЗ.
           </p>
         </div>
         {/*
