@@ -17,7 +17,7 @@ import { taskBySlug } from '@/content/tasks';
 import { workBySlug } from '@/content/works';
 
 /** Дата, на которую собран состав вопросов. Показывается и на странице, и в черновике. */
-export const BRIEF_AS_OF = '2026-09-04';
+export const BRIEF_AS_OF = '2026-10-07';
 
 export type BriefOption = {
   /** Публичный, неизменяемый идентификатор (см. предупреждение выше). */
