@@ -120,7 +120,7 @@ export const WORKS: Work[] = [
     stack:
       'TypeScript; Electron + React 18 (клиент), Node 22 + Express (сервер); PostgreSQL 16 / SQLite, Drizzle ORM; pnpm-монорепо',
     facts: [
-      { claim: 'Самый активный проект: 523 коммита за 30 дней.', asOf: '2026-07-31', verify: 'measured' },
+      { claim: 'Самый активный проект: 382 коммита за 30 дней.', asOf: '2026-10-07', verify: 'measured' },
       { claim: 'Работает офлайн: данные пишутся локально и догоняют сервер при появлении связи.', asOf: '2026-07-31', verify: 'measured' },
       { claim: 'Многоэтапный аудит безопасности — критичные находки закрыты на проде.', asOf: '2026-07-31', verify: 'measured' },
     ],
@@ -211,7 +211,7 @@ export const WORKS: Work[] = [
     stack: 'Next.js 15 + Payload CMS, TypeScript, PostgreSQL, pnpm 10; CI/CD на GitHub Actions',
     facts: [
       { claim: 'Сайт открыт и работает — можно зайти и проверить самому.', asOf: '2026-08-01', verify: 'external' },
-      { claim: '47 коммитов за последние 30 дней; серия из 8 зелёных деплоев подряд.', asOf: '2026-09-04', verify: 'measured' },
+      { claim: '42 коммита за последние 30 дней; последние 12 деплоев подряд — зелёные.', asOf: '2026-10-07', verify: 'measured' },
       { claim: 'Редактор правит сайт сам — программист для наполнения не нужен.', asOf: '2026-08-01', verify: 'measured' },
     ],
     // Оба прежних плана выполнены и убраны 04.09: веб-аналитика с согласием выкачена
